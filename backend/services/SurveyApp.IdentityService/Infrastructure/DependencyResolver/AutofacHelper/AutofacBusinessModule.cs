@@ -1,6 +1,11 @@
 ﻿using Autofac;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SurveyApp.IdentityService.Application.Dto_s;
+using SurveyApp.IdentityService.Application.Services.Implementations;
+using SurveyApp.IdentityService.Application.Services.Interfaces;
+using SurveyApp.IdentityService.Application.Validators;
 using SurveyApp.IdentityService.Infrastructure.Data;
 using SurveyApp.IdentityService.Infrastructure.Helpers.JWT;
 using SurveyApp.IdentityService.Infrastructure.Repositories.Implemantations;
@@ -17,18 +22,27 @@ namespace SurveyApp.IdentityService.Infrastructure.DependencyResolver.AutofacHel
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<JwtHelper>().As<ITokenHelper>();
-            //builder.RegisterType<AuthManager>().As<IAuthService>();
+            builder.RegisterType<JwtHelper>().As<ITokenHelper>().InstancePerLifetimeScope();
 
-            builder.RegisterType<EfUnitOfWork<IdentityDbContext>>().As<IUnitOfWork>();
+            #region services
+            builder.RegisterType<AuthManager>().As<IAuthService>().InstancePerLifetimeScope();
+            builder.RegisterType<UserManager>().As<IUserService>().InstancePerLifetimeScope();
+            builder.RegisterType<OperationClaimManager>().As<IOperationClaimService>().InstancePerLifetimeScope();
+            builder.RegisterType<UserOperationClaimManager>().As<IUserOperationClaimService>().InstancePerLifetimeScope();
+            #endregion
 
-            // Repositories
+            builder.RegisterType<EfUnitOfWork<IdentityDbContext>>().As<IUnitOfWork>().InstancePerLifetimeScope();
+
+            #region repos
             builder.RegisterType<UserRepository>().As<IUserRepository>();
             builder.RegisterType<OperationClaimRepository>().As<IOperationClaimRepository>();
             builder.RegisterType<UserOperationClaimRepository>().As<IUserOperationClaimRepository>();
+            #endregion
 
-            // Managers (Services)
-            //builder.RegisterType<UserManager>().As<IUserService>();
+            #region validators
+            builder.RegisterType<ClaimValidator>().As<IValidator<ClaimDto>>().InstancePerLifetimeScope();
+            builder.RegisterType<RegisterUserValidator>().As<IValidator<UserForRegisterDto>>().InstancePerLifetimeScope();
+            #endregion
 
             builder.Register(context =>
             {

@@ -1,9 +1,12 @@
 
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SurveyApp.IdentityService.Infrastructure.DependencyResolver.AutofacHelper;
 using SurveyApp.IdentityService.Infrastructure.Helpers.JWT;
+using SurveyApp.Shared.Helpers.Security.Encryption;
 using System.Text.Json.Serialization;
 
 namespace SurveyApp.IdentityService
@@ -55,20 +58,20 @@ namespace SurveyApp.IdentityService
             });
             var tokenOptions = configurationManager.GetSection("TokenOptions").Get<TokenOptions>();
 
-            //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //                .AddJwtBearer(options =>
-            //                {
-            //                    options.TokenValidationParameters = new TokenValidationParameters
-            //                    {
-            //                        ValidateIssuer = true,
-            //                        ValidateAudience = true,
-            //                        ValidateLifetime = true,
-            //                        ValidIssuer = tokenOptions.Issuer,
-            //                        ValidAudience = tokenOptions.Audience,
-            //                        ValidateIssuerSigningKey = true,
-            //                        IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
-            //                    };
-            //                });
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                            .AddJwtBearer(options =>
+                            {
+                                options.TokenValidationParameters = new TokenValidationParameters
+                                {
+                                    ValidateIssuer = true,
+                                    ValidateAudience = true,
+                                    ValidateLifetime = true,
+                                    ValidIssuer = tokenOptions.Issuer,
+                                    ValidAudience = tokenOptions.Audience,
+                                    ValidateIssuerSigningKey = true,
+                                    IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
+                                };
+                            });
 
             var app = builder.Build();
 
@@ -81,6 +84,7 @@ namespace SurveyApp.IdentityService
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
