@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurveyApp.Shared", "shared\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurveyApp.IdentityService", "services\SurveyApp.IdentityService\SurveyApp.IdentityService.csproj", "{F7233EC5-0C7D-4D8A-BB6F-7A3AD4F56E9D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurveyApp.SurveyManagement", "services\SurveyApp.SurveyManagement\SurveyApp.SurveyManagement\SurveyApp.SurveyManagement.csproj", "{6ADA4C51-D621-4876-B70F-D815823FEAB2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{F7233EC5-0C7D-4D8A-BB6F-7A3AD4F56E9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7233EC5-0C7D-4D8A-BB6F-7A3AD4F56E9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7233EC5-0C7D-4D8A-BB6F-7A3AD4F56E9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ADA4C51-D621-4876-B70F-D815823FEAB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ADA4C51-D621-4876-B70F-D815823FEAB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ADA4C51-D621-4876-B70F-D815823FEAB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ADA4C51-D621-4876-B70F-D815823FEAB2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{3F308F3C-CDB6-4A24-9947-6630BCD8387C} = {275D4DA0-A62F-46DE-9ABD-07F6F631D19B}
 		{F7233EC5-0C7D-4D8A-BB6F-7A3AD4F56E9D} = {2AF9EF97-6C2E-489B-9524-A883C1AF5496}
+		{6ADA4C51-D621-4876-B70F-D815823FEAB2} = {2AF9EF97-6C2E-489B-9524-A883C1AF5496}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7C6E2008-B4B6-4BE2-B7BE-BBC9230F1C77}
