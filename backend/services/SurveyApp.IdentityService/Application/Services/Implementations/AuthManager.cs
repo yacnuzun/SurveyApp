@@ -53,7 +53,7 @@ namespace SurveyApp.IdentityService.Application.Services.Implementations
             try
             {
                 var userToCheck = await _userService.GetByUserMail(userForLoginDto.Email);
-                if (userToCheck == null)
+                if (!userToCheck.Success)
                 {
                     return new ErrorDataResult<User>(Messages.UserNotFound);
                 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SurveyApp.SurveyManagement.Infrastructure.Data;
@@ -11,9 +12,11 @@ using SurveyApp.SurveyManagement.Infrastructure.Data;
 namespace SurveyApp.SurveyManagement.Migrations
 {
     [DbContext(typeof(SurveyManagementDbContext))]
-    partial class SurveyManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260321114037_update-customerid-type")]
+    partial class updatecustomeridtype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

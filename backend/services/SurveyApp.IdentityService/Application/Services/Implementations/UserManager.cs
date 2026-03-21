@@ -49,21 +49,20 @@ namespace SurveyApp.IdentityService.Application.Services.Implementations
                 throw;
             }
         }
-        public async Task<IResult> Add(User user, UserRoles role) // Task döndürmeli, IResult ile başarı durumu iletilmeli
+        public async Task<IResult> Add(User user, UserRoles role) 
         {
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
 
                 await _userRepository.AddAsync(user);
-                await _unitOfWork.CommitAsync(); // Önce User'ı commit etmeliyiz ki ID'si oluşsun
+                await _unitOfWork.CommitAsync(); 
 
                 var resultOperation = await _operationClaim.GetOperation(role.ToString());
 
                 if (!resultOperation.Success || resultOperation.Data == null)
                 {
-                    // Eğer veritabanında "Admin" veya "User" rolü yoksa otomatik oluşturabiliriz 
-                    // veya hata fırlatabiliriz.
+                    
                     throw new Exception(Messages.RoleNotFound);
                 }
 

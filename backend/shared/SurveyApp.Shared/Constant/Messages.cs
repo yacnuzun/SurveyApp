@@ -20,5 +20,6 @@ namespace SurveyApp.Shared.Constant
         public static string FailedProccess = "İşlem Başarısız.";
         public static string FailedCustomerProccess = "Bu bilgilerle kayıtlı bir kullanıcı zaten mevcut.";
         public static string RoleNotFound = "Rol bulunamadı.";
+        public static string SurveySuccessCompleted =  "Anket başarıyla oluşturuldu.";
     }
 }
