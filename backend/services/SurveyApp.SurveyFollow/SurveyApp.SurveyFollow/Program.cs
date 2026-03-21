@@ -1,22 +1,22 @@
 
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using SurveyApp.Shared.Helpers.Security.Encryption;
+using SurveyApp.SurveyFollow.Infrastructure.DependencyResolver.AutofacHelper;
 using SurveyApp.Shared.Helpers.Security.Security;
-using SurveyApp.SurveyManagement.Infrastructure.DependencyResolver.AutofacHelper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using SurveyApp.Shared.Helpers.Security.Encryption;
+using Microsoft.IdentityModel.Tokens;
 
-namespace SurveyApp.SurveyManagement
+namespace SurveyApp.SurveyFollow
 {
     public class Program
     {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
             ConfigurationManager configurationManager = builder.Configuration;
+
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -66,6 +66,7 @@ namespace SurveyApp.SurveyManagement
                                     IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
                                 };
                             });
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
@@ -77,8 +78,8 @@ namespace SurveyApp.SurveyManagement
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthentication();
+
             app.UseAuthorization();
 
 
