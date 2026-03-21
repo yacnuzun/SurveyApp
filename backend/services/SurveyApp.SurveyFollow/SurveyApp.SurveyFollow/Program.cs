@@ -66,7 +66,6 @@ namespace SurveyApp.SurveyFollow
                                     IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
                                 };
                             });
-            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 

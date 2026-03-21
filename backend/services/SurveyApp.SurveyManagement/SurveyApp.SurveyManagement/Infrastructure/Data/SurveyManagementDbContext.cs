@@ -7,9 +7,9 @@ namespace SurveyApp.SurveyManagement.Infrastructure.Data
     {
         public SurveyManagementDbContext(DbContextOptions<SurveyManagementDbContext> options) : base(options) { }
 
-        public DbSet<Option> Users { get; set; }
-        public DbSet<Question> OperationClaims { get; set; }
-        public DbSet<Survey> UserOperationClaims { get; set; }
+        public DbSet<Option> Options { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<Survey> Surveys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

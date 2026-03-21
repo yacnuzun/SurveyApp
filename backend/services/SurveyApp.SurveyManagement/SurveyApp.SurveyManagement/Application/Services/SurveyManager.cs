@@ -63,7 +63,7 @@ namespace SurveyApp.SurveyManagement.Application.Services
 
                 await _surveyRepository.AddAsync(survey);
                 await _unitOfWork.CommitAsync();
-                return new SuccesResult(Messages.SurveySuccessCompleted);
+                return new SuccesResult(Messages.SurveySuccessCreated);
             }
             catch (Exception ex)
             {
