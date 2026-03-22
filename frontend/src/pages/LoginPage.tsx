@@ -15,16 +15,23 @@ const LoginPage = () => {
 
   // Form gönderim fonksiyonu
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // login aksiyonunu tetikle
-    const resultAction = await dispatch(login({ email, password }));
-    
-    // Eğer login başarılıysa yönlendir
-    if (login.fulfilled.match(resultAction)) {
-      navigate('/surveys');
-    }
-  };
+  e.preventDefault();
+  
+  const resultAction = await dispatch(login({ email, password }));
+  
+  if (login.fulfilled.match(resultAction)) {
+  const payload = resultAction.payload as any; 
+  const userRoles = payload.role as string[]; 
+
+  const isAdmin = userRoles.some((role: string) => role.toLowerCase() === 'admin');
+
+  if (isAdmin) {
+    navigate('/admin/create-survey');
+  } else {
+    navigate('/surveys');
+  }
+}
+};
 
   return (
     <div className="login-page">

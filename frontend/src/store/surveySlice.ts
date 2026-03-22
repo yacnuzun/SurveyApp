@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../api/axiosConfig';
-import type { Survey } from '../types/Survey';
+import type { Survey, SurveyCreateDto } from '../types/Survey';
 
 export const fetchActiveSurveys = createAsyncThunk(
   'survey/fetchActive',
@@ -15,6 +15,17 @@ export const fetchActiveSurveys = createAsyncThunk(
   }
 );
 
+export const createComplexSurvey = createAsyncThunk(
+  'survey/createComplex',
+  async (surveyData: SurveyCreateDto, { rejectWithValue }) => {
+    try {
+      const response = await api.post('https://localhost:7158/api/Surveys/create-complex', surveyData);
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || 'Oluşturma hatası');
+    }
+  }
+);
 
 const surveySlice = createSlice({
   name: 'survey',

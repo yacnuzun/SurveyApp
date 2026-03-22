@@ -12,6 +12,6 @@ namespace SurveyApp.IdentityService.Application.Services.Interfaces
         Task<IDataResult<User>> Login(UserForLoginDto userForLoginDto);
         Task<IDataResult<User>> CheckUserLogin(string mail, string role);
         Task<IResult> UserExists(string userTaxId);
-        Task<IDataResult<AccessToken>> CreateAccessToken(User user);
+        Task<IDataResult<AuthResponse>> CreateAccessToken(User user);
     }
 }

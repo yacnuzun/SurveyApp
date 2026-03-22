@@ -92,11 +92,18 @@ namespace SurveyApp.IdentityService.Application.Services.Implementations
 
         }
 
-        public async Task<IDataResult<AccessToken>> CreateAccessToken(User user)
+        public async Task<IDataResult<AuthResponse>> CreateAccessToken(User user)
         {
             var claims = await _userService.GetClaims(user);
             var accessToken = _tokenHelper.CreateToken(user, claims.Data);
-            return new SuccessDataResult<AccessToken>(accessToken, Messages.AccessTokenCreated);
+            return new SuccessDataResult<AuthResponse>(
+                new AuthResponse { 
+                    UserId = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                Role=claims.Data.Select(c=> c.Name).ToList(),
+                Token= accessToken}, 
+                Messages.AccessTokenCreated);
         }
 
         public async Task<IDataResult<User>> CheckUserLogin(string mail, string role)

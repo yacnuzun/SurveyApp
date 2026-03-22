@@ -28,3 +28,23 @@ export interface Question {
 export interface SurveyDetail extends Survey {
   questions: Question[];
 }
+
+export interface OptionCreateDto {
+  text: string;
+  order: number;
+}
+
+export interface QuestionCreateDto {
+  text: string;
+  type: number; // 0: Single, 1: Multi, 2: Text
+  order: number;
+  options: OptionCreateDto[];
+}
+
+export interface SurveyCreateDto {
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  questions: QuestionCreateDto[];
+}

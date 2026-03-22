@@ -2,26 +2,29 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SurveyListPage from './pages/SurveyListPage';
 import SurveyDetailPage from './pages/SurveyDetailPage';
-// import SurveyListPage from './pages/SurveyListPage'; // Hazır olduğunda açacağız
+import AdminSurveyCreate from './pages/AdminSurveyCreate';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Ana dizine gelindiğinde direkt Login'e yönlendir */}
-        <Route path="/" element={<Navigate to="/login" />} />
-        
-        {/* Login Sayfası */}
-        <Route path="/login" element={<LoginPage />} />
+  {/* Login */}
+  <Route path="/login" element={<LoginPage />} />
 
-        {/* Anket Listesi Sayfası (Henüz içeriği boş olsa bile route'u tanımlayalım) */}
-        <Route path="/surveys" element={<SurveyListPage />} />
+  {/* Public Routes */}
+  <Route path="/surveys" element={<SurveyListPage />} />
+  <Route path="/survey-detail/:id" element={<SurveyDetailPage />} />
 
-        <Route path="/survey-detail/:id" element={<SurveyDetailPage />} />
+  {/* Admin Protected Routes */}
+  <Route path="/admin" element={<AdminRoute />}>
+    <Route path="create-survey" element={<AdminSurveyCreate />} />
+  </Route>
 
-        {/* Tanımsız yollar için Login'e geri gönder */}
-        <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
+  {/* Yönlendirmeler */}
+  <Route path="/" element={<Navigate to="/surveys" replace />} />
+  <Route path="*" element={<Navigate to="/login" replace />} />
+</Routes>
     </BrowserRouter>
   );
 }

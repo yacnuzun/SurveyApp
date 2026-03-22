@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import api from '../api/axiosConfig';
 import type { LoginRequest, AuthResponse } from '../types/User';
 
@@ -7,10 +7,14 @@ export const login = createAsyncThunk(
   async (credentials: LoginRequest, { rejectWithValue }) => {
     try {
       const response = await api.post<AuthResponse>('Account/login', credentials);
-      localStorage.setItem('token', response.data.token); // Token'ı kalıcı yap
+      
+      // ÇÖZÜM BURADA: response.data.token bir nesne olduğu için, 
+      // içindeki asıl string olan .token'ı kaydediyoruz.
+      localStorage.setItem('token', response.data.token.token); 
+      
       return response.data;
     } catch (err: any) {
-      return rejectWithValue(err.response.data.message || 'Giriş başarısız');
+      return rejectWithValue(err.response?.data?.message || 'Giriş başarısız');
     }
   }
 );
@@ -18,11 +22,11 @@ export const login = createAsyncThunk(
 const authSlice = createSlice({
   name: 'Account',
   initialState: {
-  user: null as any, // İleride User tipini buraya bağlarız
-  token: localStorage.getItem('token'),
-  isLoading: false,
-  error: null as string | null, // Tipini açıkça belirttik
-},
+    user: null as any,
+    token: localStorage.getItem('token'), // Bu zaten string döner
+    isLoading: false,
+    error: null as string | null,
+  },
   reducers: {
     logout: (state) => {
       state.user = null;
@@ -32,11 +36,26 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(login.pending, (state) => { state.isLoading = true; state.error = null; })
-      .addCase(login.fulfilled, (state, action) => {
+      .addCase(login.pending, (state) => { 
+        state.isLoading = true; 
+        state.error = null; 
+      })
+      .addCase(login.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
+        const { role, email, userName, userId, token } = action.payload;
+
         state.isLoading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
+        
+        // State'e de nesneyi değil, içindeki string'i yazıyoruz
+        state.token = token.token; 
+        
+        state.user = {
+          id: userId,
+          name: userName,
+          email: email,
+          roles: role
+        };
+
+        state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;

@@ -10,11 +10,13 @@ namespace SurveyApp.SurveyManagement.Application.Validators
             RuleFor(s => s.Title).NotEmpty().WithMessage("Anket başlığı boş olamaz.")
                                  .MaximumLength(200).WithMessage("Başlık en fazla 200 karakter olabilir.");
 
-            RuleFor(s => s.StartDate).GreaterThanOrEqualTo(DateTime.UtcNow)
-                                     .WithMessage("Başlangıç tarihi bugünden eski olamaz.");
+            RuleFor(s => s.StartDate.Date)
+                .GreaterThanOrEqualTo(DateTime.Today)
+                .WithMessage("Başlangıç tarihi bugünden eski olamaz.");
 
-            RuleFor(s => s.EndDate).GreaterThan(s => s.StartDate)
-                                   .WithMessage("Bitiş tarihi başlangıç tarihinden sonra olmalıdır.");
+            RuleFor(s => s.EndDate.Date)
+                .GreaterThan(s => s.StartDate.Date)
+                .WithMessage("Bitiş tarihi başlangıç tarihinden sonra olmalıdır.");
 
             RuleFor(s => s.Questions).NotEmpty().WithMessage("Anket en az bir soru içermelidir.");
 
