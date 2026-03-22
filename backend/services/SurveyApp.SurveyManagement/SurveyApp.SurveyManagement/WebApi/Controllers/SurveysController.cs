@@ -34,5 +34,13 @@ namespace SurveyApp.SurveyManagement.WebApi.Controllers
             var result = await _surveyService.GetAllActiveSurveys();
             return result.Success ? Ok(result.Data) : BadRequest(result.Message);
         }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _surveyService.GetSurveywithId(id);
+            return result.Success ? Ok(result.Data) : BadRequest(result.Message);
+        }
     }
 }

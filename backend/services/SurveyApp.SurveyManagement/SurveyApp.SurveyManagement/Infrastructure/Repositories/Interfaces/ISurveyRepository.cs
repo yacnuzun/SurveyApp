@@ -3,5 +3,8 @@ using SurveyApp.SurveyManagement.Domain.Entities;
 
 namespace SurveyApp.SurveyManagement.Infrastructure.Repositories.Interfaces
 {
-    public interface ISurveyRepository : IRepository<Survey> { }
+    public interface ISurveyRepository : IRepository<Survey> 
+    {
+        Task<Survey?> GetWithQuestionsAndOptionsAsync(int id);
+    }
 }

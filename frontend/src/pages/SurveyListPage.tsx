@@ -3,10 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchActiveSurveys } from '../store/surveySlice';
 import type { AppDispatch, RootState } from '../store/appStore';
 import type { Survey } from '../types/Survey';
+import { useNavigate } from 'react-router-dom';
+
 //import './SurveyListPage.css';
 
 const SurveyListPage = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { surveys, isLoading, error } = useSelector((state: RootState) => state.survey);
 
   useEffect(() => {
@@ -31,7 +34,7 @@ const SurveyListPage = () => {
                 <h3>{survey.title}</h3>
                 <p>{survey.description}</p>
               </div>
-              <button className="join-button" onClick={() => console.log("Ankete git:", survey.id)}>
+              <button className="join-button" onClick={() => navigate(`/survey-detail/${survey.id}`)}>
                 Katıl
               </button>
             </div>

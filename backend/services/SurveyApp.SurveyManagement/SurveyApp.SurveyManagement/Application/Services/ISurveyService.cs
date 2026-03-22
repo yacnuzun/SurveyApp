@@ -9,5 +9,6 @@ namespace SurveyApp.SurveyManagement.Application.Services
     {
         Task<IResult> CreateComplexSurvey(SurveyForCreateDto surveyDto, int adminId);
         Task<IDataResult<List<Survey>>> GetAllActiveSurveys();
+        Task<IDataResult<SurveyDetailDto>> GetSurveywithId(int id);
     }
 }

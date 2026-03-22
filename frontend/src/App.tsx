@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SurveyListPage from './pages/SurveyListPage';
+import SurveyDetailPage from './pages/SurveyDetailPage';
 // import SurveyListPage from './pages/SurveyListPage'; // Hazır olduğunda açacağız
 
 function App() {
@@ -15,6 +16,8 @@ function App() {
 
         {/* Anket Listesi Sayfası (Henüz içeriği boş olsa bile route'u tanımlayalım) */}
         <Route path="/surveys" element={<SurveyListPage />} />
+
+        <Route path="/survey-detail/:id" element={<SurveyDetailPage />} />
 
         {/* Tanımsız yollar için Login'e geri gönder */}
         <Route path="*" element={<Navigate to="/login" />} />

@@ -78,5 +78,32 @@ namespace SurveyApp.SurveyManagement.Application.Services
             var result = await _surveyRepository.ListAsync(s => s.IsActive && s.EndDate > DateTime.UtcNow);
             return new SuccessDataResult<List<Survey>>(result.ToList());
         }
+
+        public async Task<IDataResult<SurveyDetailDto>> GetSurveywithId(int id)
+        {
+            var survey = await _surveyRepository.GetWithQuestionsAndOptionsAsync(id);
+            if (survey == null)
+                return new ErrorDataResult<SurveyDetailDto>("Anket bulunamadı.");
+
+            // Entity -> DTO Dönüşümü (Manuel Mapping)
+            var surveyDto = new SurveyDetailDto
+            {
+                Id = survey.Id,
+                Title = survey.Title,
+                Description = survey.Description,
+                Questions = survey.Questions.Select(q => new QuestionDetailDto
+                {
+                    Id = q.Id,
+                    Text = q.Text,
+                    Type = (int)q.Type,
+                    Options = q.Options?.Select(o => new OptionDetailDto
+                    {
+                        Id = o.Id,
+                        Text = o.Text
+                    }).ToList()
+                }).ToList()
+            };
+            return new SuccessDataResult<SurveyDetailDto>(surveyDto);
+        }
     }
 }
