@@ -73,6 +73,19 @@ namespace SurveyApp.IdentityService
                                 };
                             });
 
+            var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("FrontendPolicy", policy =>
+                {
+                    policy.WithOrigins(allowedOrigins) 
+                          .AllowAnyHeader()            
+                          .AllowAnyMethod()            
+                          .AllowCredentials();         
+                });
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -84,9 +97,9 @@ namespace SurveyApp.IdentityService
 
             app.UseHttpsRedirection();
 
+            app.UseCors("FrontendPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 

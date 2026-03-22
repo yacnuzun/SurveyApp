@@ -66,7 +66,18 @@ namespace SurveyApp.SurveyManagement
                                     IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
                                 };
                             });
+            var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("FrontendPolicy", policy =>
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -77,7 +88,7 @@ namespace SurveyApp.SurveyManagement
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("FrontendPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
 
