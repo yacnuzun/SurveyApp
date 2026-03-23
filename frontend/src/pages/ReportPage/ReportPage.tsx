@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useReportStore } from '../store/useReportStore';
+import { useReportStore } from '../../store/useReportStore';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import './ReportPage.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import type { AppDispatch } from '../store/appStore';
-import { createComplexSurvey } from '../store/surveySlice';
-import type { SurveyCreateDto, QuestionCreateDto } from '../types/Survey';
+import type { AppDispatch } from '../../store/appStore';
+import { createComplexSurvey } from '../../store/surveySlice';
+import type { SurveyCreateDto, QuestionCreateDto } from '../../types/Survey';
 import { useNavigate } from 'react-router-dom';
+import './AdminSurveyCreate.css';
 
 const AdminSurveyCreate = () => {
   const dispatch = useDispatch<AppDispatch>();

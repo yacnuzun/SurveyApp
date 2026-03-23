@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchActiveSurveys } from '../store/surveySlice';
-import type { AppDispatch, RootState } from '../store/appStore';
-import type { Survey } from '../types/Survey';
+import { fetchActiveSurveys } from '../../store/surveySlice';
+import type { AppDispatch, RootState } from '../../store/appStore';
+import type { Survey } from '../../types/Survey';
 import { useNavigate } from 'react-router-dom';
+import './SurveyListPage.css';
 
 
 const SurveyListPage = () => {

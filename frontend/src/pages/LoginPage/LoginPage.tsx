@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../store/authSlice'; 
-import { type AppDispatch } from '../store/appStore';
-//import './LoginPage.css'; 
+import { login } from '../../store/authSlice'; 
+import { type AppDispatch } from '../../store/appStore';
+import './LoginPage.css'; 
 
 const LoginPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -16,21 +16,21 @@ const LoginPage = () => {
   // Form gönderim fonksiyonu
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
-  
   const resultAction = await dispatch(login({ email, password }));
-  
+
   if (login.fulfilled.match(resultAction)) {
-  const payload = resultAction.payload as any; 
-  const userRoles = payload.role as string[]; 
+    // Backend'den 'Role' (büyük harf veya küçük harf JSON'a göre değişir) geliyor
+    const roles = resultAction.payload.role as string[]; 
 
-  const isAdmin = userRoles.some((role: string) => role.toLowerCase() === 'admin');
+    // Admin mi kontrolü (.some() kullanımı)
+    const isAdmin = roles.some((r: string) => r.toLowerCase() === 'admin');
 
-  if (isAdmin) {
-    navigate('/admin/create-survey');
-  } else {
-    navigate('/surveys');
+    if (isAdmin) {
+      navigate('/admin/create-survey');
+    } else {
+      navigate('/surveys');
+    }
   }
-}
 };
 
   return (

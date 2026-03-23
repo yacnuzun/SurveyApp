@@ -1,0 +1,100 @@
+/* src/pages/SurveyListPage/SurveyListPage.css */
+
+.survey-list-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+}
+
+.survey-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.survey-header h1 {
+    font-size: 36px;
+    color: #2d3436;
+    margin-bottom: 10px;
+}
+
+.survey-header p {
+    color: #636e72;
+    font-size: 18px;
+}
+
+/* Kart Izgarası (Grid) */
+.survey-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+}
+
+/* Anket Kartı */
+.survey-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid #f1f2f6;
+}
+
+.survey-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.card-content h3 {
+    font-size: 20px;
+    color: #2d3436;
+    margin-bottom: 12px;
+}
+
+.card-content p {
+    color: #636e72;
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+/* Butonlar */
+.survey-card button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+    border: none;
+}
+
+.join-button {
+    background: #4834d4;
+    color: white;
+}
+
+.join-button:hover {
+    background: #3c2bb3;
+}
+
+.report-btn {
+    background: #f1f2f6;
+    color: #2d3436;
+}
+
+.report-btn:hover {
+    background: #dfe4ea;
+}
+
+/* Yardımcı Sınıflar */
+.loader, .no-data {
+    text-align: center;
+    font-size: 20px;
+    margin-top: 50px;
+    color: #636e72;
+}

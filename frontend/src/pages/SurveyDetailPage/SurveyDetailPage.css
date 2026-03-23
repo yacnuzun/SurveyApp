@@ -1,0 +1,111 @@
+/* src/pages/SurveyDetailPage/SurveyDetailPage.css */
+
+.survey-detail-container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+    color: #2d3436;
+}
+
+.survey-detail-container h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #4834d4; /* Ana başlık rengi */
+}
+
+.survey-description {
+    font-size: 16px;
+    color: #636e72;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.question-block {
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    transition: box-shadow 0.3s ease;
+}
+
+.question-block:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+}
+
+.question-block h4 {
+    margin-bottom: 18px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Metin Girişi Stili */
+.survey-input-text {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #edf2f7;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.survey-input-text:focus {
+    border-color: #4834d4;
+}
+
+/* Seçenek (Radio) Stilleri */
+.option-label {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border: 2px solid #edf2f7;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.option-label:hover {
+    background-color: #f8faff;
+    border-color: #d1d8ff;
+}
+
+.option-label input[type="radio"] {
+    margin-right: 12px;
+    width: 18px;
+    height: 18px;
+    accent-color: #4834d4; /* Radio buton rengi */
+}
+
+.option-text {
+    font-size: 15px;
+    color: #2d3436;
+}
+
+/* Buton Stili */
+.btn-finish {
+    width: 100%;
+    background: #4834d4;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 20px;
+}
+
+.btn-finish:hover {
+    background: #3c2bb3;
+    transform: translateY(-2px);
+}
+
+.btn-finish:active {
+    transform: translateY(0);
+}

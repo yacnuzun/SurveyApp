@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; // navigate eklendi
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchSurveyById, setAnswer, submitSurveyAnswers } from '../store/participationSlice'; // submit eklendi
-import type { RootState, AppDispatch } from '../store/appStore';
-import type { Question } from '../types/Survey'; 
-import { QuestionType } from '../types/Survey';
+import { fetchSurveyById, setAnswer, submitSurveyAnswers } from '../../store/participationSlice'; // submit eklendi
+import type { RootState, AppDispatch } from '../../store/appStore';
+import type { Question } from '../../types/Survey'; 
+import { QuestionType } from '../../types/Survey';
+import './SurveyDetailPage.css';
 
 const SurveyDetailPage = () => {
   const { id } = useParams<{ id: string }>();

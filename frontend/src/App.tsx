@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import SurveyListPage from './pages/SurveyListPage';
-import SurveyDetailPage from './pages/SurveyDetailPage';
-import AdminSurveyCreate from './pages/AdminSurveyCreate';
+import LoginPage from './pages/LoginPage/LoginPage';
+import SurveyListPage from './pages/SurveyListPage/SurveyListPage';
+import SurveyDetailPage from './pages/SurveyDetailPage/SurveyDetailPage';
+import AdminSurveyCreate from './pages/AdminSurveyCreate/AdminSurveyCreate';
 import AdminRoute from './components/AdminRoute';
-import ReportPage from './pages/ReportPage';
+import ReportPage from './pages/ReportPage/ReportPage';
 
 function App() {
   return (
