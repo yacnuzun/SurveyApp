@@ -4,6 +4,7 @@ import SurveyListPage from './pages/SurveyListPage';
 import SurveyDetailPage from './pages/SurveyDetailPage';
 import AdminSurveyCreate from './pages/AdminSurveyCreate';
 import AdminRoute from './components/AdminRoute';
+import ReportPage from './pages/ReportPage';
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
   <Route path="/admin" element={<AdminRoute />}>
     <Route path="create-survey" element={<AdminSurveyCreate />} />
   </Route>
-
+    <Route path="/admin/surveys/:id/report" element={<ReportPage />} />
   {/* Yönlendirmeler */}
   <Route path="/" element={<Navigate to="/surveys" replace />} />
   <Route path="*" element={<Navigate to="/login" replace />} />

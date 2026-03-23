@@ -5,7 +5,6 @@ import type { AppDispatch, RootState } from '../store/appStore';
 import type { Survey } from '../types/Survey';
 import { useNavigate } from 'react-router-dom';
 
-//import './SurveyListPage.css';
 
 const SurveyListPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -37,6 +36,12 @@ const SurveyListPage = () => {
               <button className="join-button" onClick={() => navigate(`/survey-detail/${survey.id}`)}>
                 Katıl
               </button>
+              <button 
+              onClick={() => navigate(`/admin/surveys/${survey.id}/report`)}
+              className="report-btn"
+              >
+                  İstatistikleri Gör
+            </button>
             </div>
           ))
         ) : (

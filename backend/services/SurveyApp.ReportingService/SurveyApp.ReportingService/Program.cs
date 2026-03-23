@@ -90,7 +90,8 @@ namespace SurveyApp.ReportingService
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("FrontendPolicy");
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
