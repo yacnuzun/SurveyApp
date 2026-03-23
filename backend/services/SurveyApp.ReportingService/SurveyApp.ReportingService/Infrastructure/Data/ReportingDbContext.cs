@@ -14,6 +14,12 @@ namespace SurveyApp.ReportingService.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("public");
+
+            modelBuilder.Entity<SurveyStatistic>().HasData(
+                new SurveyStatistic { Id = 1, SurveyId = 1, QuestionText = "Memnuniyet", OptionText = "Evet", Count = 10 },
+                new SurveyStatistic { Id = 2, SurveyId = 1, QuestionText = "Memnuniyet", OptionText = "Hayır", Count = 2 }
+            );
+
             base.OnModelCreating(modelBuilder);
         }
     }

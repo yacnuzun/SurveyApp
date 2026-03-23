@@ -1,7 +1,13 @@
 
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SurveyApp.ReportingService.Infrastructure.DependencyResolver;
+using SurveyApp.Shared.Helpers.Security.Encryption;
+using SurveyApp.Shared.Helpers.Security.Security;
 
 namespace SurveyApp.ReportingService
 {
@@ -10,6 +16,7 @@ namespace SurveyApp.ReportingService
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            ConfigurationManager configurationManager = builder.Configuration;
 
             // Add services to the container.
 
@@ -19,7 +26,60 @@ namespace SurveyApp.ReportingService
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer"
+                });
 
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+
+            });
+            var tokenOptions = configurationManager.GetSection("TokenOptions").Get<TokenOptions>();
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                            .AddJwtBearer(options =>
+                            {
+                                options.TokenValidationParameters = new TokenValidationParameters
+                                {
+                                    ValidateIssuer = true,
+                                    ValidateAudience = true,
+                                    ValidateLifetime = true,
+                                    ValidIssuer = tokenOptions.Issuer,
+                                    ValidAudience = tokenOptions.Audience,
+                                    ValidateIssuerSigningKey = true,
+                                    IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
+                                };
+                            });
+            var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("FrontendPolicy", policy =>
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

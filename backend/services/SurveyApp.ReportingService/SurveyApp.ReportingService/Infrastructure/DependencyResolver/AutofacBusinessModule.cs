@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
+using SurveyApp.ReportingService.Application.Services;
 using SurveyApp.ReportingService.Infrastructure.Data;
+using SurveyApp.ReportingService.Infrastructure.Repositories;
 using SurveyApp.Shared.Persistance.Implamantations;
 using SurveyApp.Shared.Persistance.Interfaces;
 using System.Reflection;
@@ -13,21 +15,16 @@ namespace SurveyApp.ReportingService.Infrastructure.DependencyResolver
         protected override void Load(ContainerBuilder builder)
         {
             #region services
-            
+            builder.RegisterType<ReportManager>().As<IReportService>();
+
             #endregion
 
             builder.RegisterType<EfUnitOfWork<ReportingDbContext>>().As<IUnitOfWork>().InstancePerLifetimeScope();
 
             #region repos
-            //builder.RegisterType<UserRepository>().As<IUserRepository>();
-            //builder.RegisterType<OperationClaimRepository>().As<IOperationClaimRepository>();
-            //builder.RegisterType<UserOperationClaimRepository>().As<IUserOperationClaimRepository>();
+            builder.RegisterType<ReportRepository>().As<IReportRepository>();
             #endregion
 
-            #region validators
-            //builder.RegisterType<ClaimValidator>().As<IValidator<ClaimDto>>().InstancePerLifetimeScope();
-            //builder.RegisterType<RegisterUserValidator>().As<IValidator<UserForRegisterDto>>().InstancePerLifetimeScope();
-            #endregion
 
             builder.Register(context =>
             {
