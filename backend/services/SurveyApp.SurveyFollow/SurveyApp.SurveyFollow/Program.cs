@@ -1,12 +1,14 @@
 
 using Autofac;
+using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using SurveyApp.SurveyFollow.Infrastructure.DependencyResolver.AutofacHelper;
-using SurveyApp.Shared.Helpers.Security.Security;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using SurveyApp.Shared.Helpers.Security.Encryption;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using SurveyApp.Shared.Helpers.Security.Encryption;
+using SurveyApp.Shared.Helpers.Security.Security;
+using SurveyApp.SurveyFollow.Infrastructure.DependencyResolver.AutofacHelper;
 
 namespace SurveyApp.SurveyFollow
 {
@@ -51,7 +53,17 @@ namespace SurveyApp.SurveyFollow
 
             });
             var tokenOptions = configurationManager.GetSection("TokenOptions").Get<TokenOptions>();
-
+            builder.Services.AddMassTransit(x =>
+            {
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(configurationManager["RabbitOptions:Url"], h =>
+                    {
+                        h.Username(configurationManager["RabbitOptions:User"]);
+                        h.Password(configurationManager["RabbitOptions:Password"]);
+                    });
+                });
+            });
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                             .AddJwtBearer(options =>
                             {

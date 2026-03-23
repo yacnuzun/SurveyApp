@@ -1,6 +1,8 @@
 
 using Autofac;
+using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -8,6 +10,8 @@ using Microsoft.OpenApi.Models;
 using SurveyApp.ReportingService.Infrastructure.DependencyResolver;
 using SurveyApp.Shared.Helpers.Security.Encryption;
 using SurveyApp.Shared.Helpers.Security.Security;
+using SurveyApp.Shared;
+using SurveyApp.ReportingService.Infrastructure.Helpers.Consumer;
 
 namespace SurveyApp.ReportingService
 {
@@ -53,7 +57,23 @@ namespace SurveyApp.ReportingService
 
             });
             var tokenOptions = configurationManager.GetSection("TokenOptions").Get<TokenOptions>();
+            builder.Services.AddMassTransit(x =>
+            {
+                x.AddConsumer<SurveySubmittedConsumer>(); 
 
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(configurationManager["RabbitOptions:Url"], h => {
+                        h.Username(configurationManager["RabbitOptions:User"]);
+                        h.Password(configurationManager["RabbitOptions:Password"]);
+                    });
+
+                    cfg.ReceiveEndpoint("survey-submitted-queue", e =>
+                    {
+                        e.ConfigureConsumer<SurveySubmittedConsumer>(context);
+                    });
+                });
+            });
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                             .AddJwtBearer(options =>
                             {

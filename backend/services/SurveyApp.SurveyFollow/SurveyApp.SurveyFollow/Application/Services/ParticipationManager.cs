@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
+using MassTransit;
 using SurveyApp.Shared.Constant;
+using SurveyApp.Shared.Events;
 using SurveyApp.Shared.Helpers.ResponseModels.GenericResultModels;
 using SurveyApp.Shared.Persistance.Interfaces;
 using SurveyApp.SurveyFollow.Application.Dto_s;
@@ -15,13 +17,15 @@ namespace SurveyApp.SurveyFollow.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<ParticipationManager> _log;
         private readonly IValidator<ParticipationForCreateDto> _participationValidator;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public ParticipationManager(IParticipationRepository participationRepository, IUnitOfWork unitOfWork, IValidator<ParticipationForCreateDto> participationValidator, ILogger<ParticipationManager> log)
+        public ParticipationManager(IParticipationRepository participationRepository, IUnitOfWork unitOfWork, IValidator<ParticipationForCreateDto> participationValidator, ILogger<ParticipationManager> log, IPublishEndpoint publishEndpoint)
         {
             _participationRepository = participationRepository;
             _unitOfWork = unitOfWork;
             _participationValidator = participationValidator;
             _log = log;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<IResult> SubmitParticipation(ParticipationForCreateDto dto, int userId)
@@ -51,6 +55,14 @@ namespace SurveyApp.SurveyFollow.Application.Services
 
                 await _participationRepository.AddAsync(participation);
                 await _unitOfWork.CommitAsync();
+
+                await _publishEndpoint.Publish<ISurveySubmittedEvent>(new
+                {
+                    SurveyId = dto.SurveyId,
+                    //ParticipantId = dto.UserId,
+                    SubmittedAt = DateTime.UtcNow,
+                    Answers = dto.Answers // AnswerMessageDto listesi
+                });
 
                 return new SuccesResult(Messages.SurveySuccessCompleted);
             }
