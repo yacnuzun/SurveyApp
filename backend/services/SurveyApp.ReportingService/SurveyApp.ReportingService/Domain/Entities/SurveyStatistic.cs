@@ -1,6 +1,8 @@
-﻿namespace SurveyApp.ReportingService.Domain.Entities
+﻿using SurveyApp.Shared.Persistance.Entities;
+
+namespace SurveyApp.ReportingService.Domain.Entities
 {
-    public class SurveyStatistic
+    public class SurveyStatistic:IEntity
     {
         public int Id { get; set; }
         public int SurveyId { get; set; }

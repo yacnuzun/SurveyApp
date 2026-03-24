@@ -1,10 +1,11 @@
 ﻿using SurveyApp.ReportingService.Domain.Entities;
+using SurveyApp.Shared.Persistance.Interfaces;
 
 namespace SurveyApp.ReportingService.Infrastructure.Repositories
 {
-    public interface IReportRepository
+    public interface IReportRepository : IRepository<SurveyStatistic>
     {
-        Task<List<SurveyStatistic>> GetStatsBySurveyId(int surveyId);
-        Task UpdateStats(int surveyId, string question, string option); 
+        Task<List<SurveyStatistic>> GetBySurveyIdAsync(int surveyId);
     }
+
 }

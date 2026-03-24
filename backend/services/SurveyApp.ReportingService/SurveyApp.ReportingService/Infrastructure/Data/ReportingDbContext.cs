@@ -9,18 +9,20 @@ namespace SurveyApp.ReportingService.Infrastructure.Data
     {
         public ReportingDbContext(DbContextOptions<ReportingDbContext> options) : base(options) { }
 
-        public DbSet<SurveyStatistic> Statistics { get; set; }
+        public DbSet<SurveyStatistic> SurveyStatistics { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema("public");
-
-            modelBuilder.Entity<SurveyStatistic>().HasData(
-                new SurveyStatistic { Id = 1, SurveyId = 1, QuestionText = "Memnuniyet", OptionText = "Evet", Count = 10 },
-                new SurveyStatistic { Id = 2, SurveyId = 1, QuestionText = "Memnuniyet", OptionText = "Hayır", Count = 2 }
-            );
-
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<SurveyStatistic>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.QuestionText).IsRequired().HasMaxLength(500);
+                e.Property(x => x.OptionText).HasMaxLength(200);
+                // SurveyId sadece int — join yok, denormalized veri
+                e.HasIndex(x => x.SurveyId);
+            });
         }
     }
 }

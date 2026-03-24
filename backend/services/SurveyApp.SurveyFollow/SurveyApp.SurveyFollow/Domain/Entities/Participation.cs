@@ -2,13 +2,14 @@
 
 namespace SurveyApp.SurveyFollow.Domain.Entities
 {
-    public class Participation : BaseEntity
+    public class Participation : IEntity
     {
-        public int SurveyId { get; set; } // Management servisindeki Survey ID
-        public int UserId { get; set; }   // Identity servisindeki User ID
+        public int Id { get; set; }
+        public int SurveyId { get; set; }
+        public int UserId { get; set; }
         public DateTime ParticipationDate { get; set; } = DateTime.UtcNow;
 
-        // Navigation Property
-        public ICollection<Answer> Answers { get; set; } = new HashSet<Answer>();
+        public ICollection<Answer> Answers { get; set; } = new List<Answer>();
     }
+
 }

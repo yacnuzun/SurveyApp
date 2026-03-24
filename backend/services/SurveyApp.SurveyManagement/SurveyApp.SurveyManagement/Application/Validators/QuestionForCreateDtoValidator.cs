@@ -8,14 +8,14 @@ namespace SurveyApp.SurveyManagement.Application.Validators
     {
         public QuestionForCreateDtoValidator()
         {
-            RuleFor(q => q.Text).NotEmpty().WithMessage("Soru metni boş olamaz.");
-            RuleFor(q => q.Order).GreaterThan(0).WithMessage("Soru sırası 0'dan büyük olmalıdır.");
+            RuleFor(q => q.Text)
+            .NotEmpty().WithMessage("Soru metni boş olamaz.")
+            .MaximumLength(500).WithMessage("Soru metni en fazla 500 karakter olabilir.");
 
-            // Eğer soru tipi Single veya Multi ise en az 2 seçenek olmalı
-            RuleFor(q => q.Options)
-                .Must(o => o != null && o.Count >= 2)
-                .When(q => q.Type == QuestionType.Single || q.Type == QuestionType.Multi)
-                .WithMessage("Çoktan seçmeli sorular en az 2 seçenek içermelidir.");
+            RuleFor(q => q.AnswerTemplateId)
+                .NotNull().WithMessage("Seçimli sorular için cevap şablonu seçilmelidir.")
+                .When(q => q.Type != QuestionType.Text);
+
         }
     }
 }

@@ -7,7 +7,6 @@ namespace SurveyApp.ReportingService.Infrastructure.Helpers.Consumer
     public class SurveySubmittedConsumer : IConsumer<ISurveySubmittedEvent>
     {
         private readonly ILogger<SurveySubmittedConsumer> _logger;
-        // Burada kendi DB Context'ini veya Service'ini enjekte edeceksin
         private readonly IReportService _reportService;
 
         public SurveySubmittedConsumer(ILogger<SurveySubmittedConsumer> logger, IReportService reportService)
@@ -20,25 +19,19 @@ namespace SurveyApp.ReportingService.Infrastructure.Helpers.Consumer
         {
             var data = context.Message;
 
-            var processDto = new
-            {
-                SurveyId = data.SurveyId,
-                Answers = data.Answers.Select(a => new
-                {
-                    QuestionId = a.QuestionId,
-                    OptionId = a.OptionId,
-                    TextAnswer = a.TextAnswer
-                }).ToList()
-            };
+            _logger.LogInformation("SurveySubmitted event alındı. SurveyId: {SurveyId}", data.SurveyId);
 
-            _logger.LogInformation($"Yeni anket cevabı alındı! SurveyId: {data.SurveyId}");
-
-            // TODO: Burada veritabanı güncelleme mantığını çalıştıracağız
-            foreach (var item in processDto.Answers)
+            foreach (var answer in data.Answers)
             {
-                await _reportService.ProcessSurveyAnswerAsync(processDto.SurveyId, item.QuestionId.ToString(),item.TextAnswer);
+                // Text tipi sorular raporda gösterilmez, sadece seçimli olanlar
+                if (string.IsNullOrEmpty(answer.OptionText)) continue;
+
+                await _reportService.ProcessSurveyAnswerAsync(
+                    data.SurveyId,
+                    answer.QuestionText,
+                    answer.OptionText);
             }
-            
+
         }
     }
 }

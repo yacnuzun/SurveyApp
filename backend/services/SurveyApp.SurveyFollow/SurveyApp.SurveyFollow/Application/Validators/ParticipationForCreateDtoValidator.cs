@@ -7,12 +7,29 @@ namespace SurveyApp.SurveyFollow.Application.Validators
     {
         public ParticipationForCreateDtoValidator()
         {
-            RuleFor(x => x.SurveyId).GreaterThan(0);
-            RuleFor(x => x.Answers).NotEmpty().WithMessage("En az bir soruya cevap verilmelidir.");
-            RuleForEach(x => x.Answers).ChildRules(answer => {
-                answer.RuleFor(a => a.QuestionId).GreaterThan(0);
-                // Ya OptionId ya da TextAnswer dolu olmalı mantığı eklenebilir
-            });
+            RuleFor(p => p.SurveyId)
+            .GreaterThan(0).WithMessage("Geçerli bir anket seçilmelidir.");
+
+            RuleFor(p => p.Answers)
+                .NotEmpty().WithMessage("En az bir cevap girilmelidir.");
+
+            RuleForEach(p => p.Answers)
+                .SetValidator(new AnswerForCreateDtoValidator());
+
         }
     }
+    public class AnswerForCreateDtoValidator : AbstractValidator<AnswerForCreateDto>
+    {
+        public AnswerForCreateDtoValidator()
+        {
+            RuleFor(a => a.QuestionId)
+                .GreaterThan(0).WithMessage("Geçerli bir soru seçilmelidir.");
+
+            // OptionId veya TextAnswer'dan biri dolu olmalı
+            RuleFor(a => a)
+                .Must(a => a.OptionId.HasValue || !string.IsNullOrEmpty(a.TextAnswer))
+                .WithMessage("Her soru için bir cevap girilmelidir.");
+        }
+    }
+
 }

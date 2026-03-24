@@ -10,12 +10,14 @@ namespace SurveyApp.Shared.Events
     {
         int SurveyId { get; }
         DateTime SubmittedAt { get; }
-        List<AnswerMessageDto> Answers { get; }
+        List<IAnswerMessage> Answers { get; }
     }
-    public class AnswerMessageDto
+    public interface IAnswerMessage
     {
-        public int QuestionId { get; set; }
-        public int? OptionId { get; set; } 
-        public string? TextAnswer { get; set; } 
+        int QuestionId { get; }
+        string QuestionText { get; }
+        int? OptionId { get; }
+        string? OptionText { get; }
+        string? TextAnswer { get; }
     }
 }

@@ -17,7 +17,6 @@ namespace SurveyApp.SurveyFollow.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("public")
                 .HasAnnotation("ProductVersion", "8.0.25")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -31,12 +30,6 @@ namespace SurveyApp.SurveyFollow.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
                     b.Property<int?>("OptionId")
                         .HasColumnType("integer");
 
@@ -47,13 +40,14 @@ namespace SurveyApp.SurveyFollow.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("TextAnswer")
-                        .HasColumnType("text");
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ParticipationId");
 
-                    b.ToTable("Answers", "public");
+                    b.ToTable("Answers");
                 });
 
             modelBuilder.Entity("SurveyApp.SurveyFollow.Domain.Entities.Participation", b =>
@@ -63,12 +57,6 @@ namespace SurveyApp.SurveyFollow.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("ParticipationDate")
                         .HasColumnType("timestamp with time zone");
@@ -81,7 +69,10 @@ namespace SurveyApp.SurveyFollow.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Participations", "public");
+                    b.HasIndex("SurveyId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("Participations");
                 });
 
             modelBuilder.Entity("SurveyApp.SurveyFollow.Domain.Entities.Answer", b =>

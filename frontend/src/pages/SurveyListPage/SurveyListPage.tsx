@@ -6,11 +6,14 @@ import type { Survey } from '../../types/Survey';
 import { useNavigate } from 'react-router-dom';
 import './SurveyListPage.css';
 
-
 const SurveyListPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { surveys, isLoading, error } = useSelector((state: RootState) => state.survey);
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  // Admin kontrolü
+  const isAdmin = user?.roles?.some((r: string) => r.toLowerCase() === 'admin');
 
   useEffect(() => {
     dispatch(fetchActiveSurveys());
@@ -34,15 +37,23 @@ const SurveyListPage = () => {
                 <h3>{survey.title}</h3>
                 <p>{survey.description}</p>
               </div>
-              <button className="join-button" onClick={() => navigate(`/survey-detail/${survey.id}`)}>
+
+              <button
+                className="join-button"
+                onClick={() => navigate(`/survey-detail/${survey.id}`)}
+              >
                 Katıl
               </button>
-              <button 
-              onClick={() => navigate(`/admin/surveys/${survey.id}/report`)}
-              className="report-btn"
-              >
-                  İstatistikleri Gör
-            </button>
+
+              {/* Sadece admin görebilir */}
+              {isAdmin && (
+                <button
+                  className="report-btn"
+                  onClick={() => navigate(`/admin/surveys/${survey.id}/report`)}
+                >
+                  📊 İstatistikleri Gör
+                </button>
+              )}
             </div>
           ))
         ) : (

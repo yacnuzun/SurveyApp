@@ -7,8 +7,13 @@ namespace SurveyApp.SurveyFollow.Infrastructure.Repositories.Implemantations
 {
     public class ParticipationRepository : EfRepository<Participation, ParticipationDbContext>, IParticipationRepository
     {
-        public ParticipationRepository(ParticipationDbContext context) : base(context)
+        public ParticipationRepository(ParticipationDbContext context) : base(context) { }
+
+        public async Task<bool> HasUserParticipatedAsync(int surveyId, int userId)
         {
+            var result = await GetAsync(p => p.SurveyId == surveyId && p.UserId == userId);
+            return result != null;
         }
     }
+
 }

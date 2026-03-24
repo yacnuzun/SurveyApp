@@ -1,44 +1,47 @@
-export interface Survey {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: string;
-}
+// src/types/Survey.ts — GÜNCELLENDİ
+import type { TemplateOption } from './Answertemplate.ts';
+
 
 export const QuestionType = {
   Single: 0,
   Multi: 1,
-  Text: 2
+  Text: 2,
 } as const;
-
-export type QuestionType = typeof QuestionType[keyof typeof QuestionType];
-
-export interface QuestionOption {
-  id: number;
-  text: string;
-}
+export type QuestionType = (typeof QuestionType)[keyof typeof QuestionType];
 
 export interface Question {
   id: number;
   text: string;
   type: QuestionType;
-  options: QuestionOption[] | null;
+  answerTemplateId?: number;
+  answerTemplateName?: string;
+  options: TemplateOption[];
 }
 
+export interface Survey {
+  id: number;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  assignedUserIds: number[];
+  questions: Question[];
+}
 export interface SurveyDetail extends Survey {
   questions: Question[];
 }
 
-export interface OptionCreateDto {
-  text: string;
-  order: number;
-}
+// --- Create / Update DTOs ---
 
 export interface QuestionCreateDto {
   text: string;
-  type: number; // 0: Single, 1: Multi, 2: Text
-  order: number;
-  options: OptionCreateDto[];
+  type: QuestionType;
+  answerTemplateId?: number;
+}
+
+export interface QuestionUpdateDto extends QuestionCreateDto {
+  id: number;
 }
 
 export interface SurveyCreateDto {
@@ -46,5 +49,24 @@ export interface SurveyCreateDto {
   description: string;
   startDate: string;
   endDate: string;
-  questions: QuestionCreateDto[];
+  questionIds: number[];
+  assignedUserIds: number[];
+}
+
+export interface SurveyUpdateDto extends SurveyCreateDto {
+  id: number;
+  isActive: boolean;
+}
+
+// --- Participation (anket cevaplama) ---
+
+export interface AnswerForCreateDto {
+  questionId: number;
+  optionId: number | null;      // TemplateOption.id — Single/Multi için
+  textAnswer: string | null;    // Text tipi için
+}
+
+export interface ParticipationForCreateDto {
+  surveyId: number;
+  answers: AnswerForCreateDto[];
 }

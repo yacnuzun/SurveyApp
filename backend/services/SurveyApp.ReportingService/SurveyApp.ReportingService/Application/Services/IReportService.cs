@@ -4,7 +4,8 @@ namespace SurveyApp.ReportingService.Application.Services
 {
     public interface IReportService
     {
-        Task<SurveyReportDto> GetSurveyReportAsync(int surveyId);
-        Task ProcessSurveyAnswerAsync(int surveyId, string question, string option);
+        Task<SurveyReportDto?> GetSurveyReportAsync(int surveyId);
+        Task ProcessSurveyAnswerAsync(int surveyId, string questionText, string optionText);
     }
+
 }

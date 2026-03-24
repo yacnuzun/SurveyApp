@@ -8,7 +8,6 @@ namespace SurveyApp.SurveyFollow.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class ParticipationsController : ControllerBase
     {
         private readonly IParticipationService _participationService;
@@ -19,10 +18,11 @@ namespace SurveyApp.SurveyFollow.WebApi.Controllers
         }
 
         [HttpPost("submit")]
+        [Authorize]
         public async Task<IActionResult> Submit(ParticipationForCreateDto dto)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
-
+            var userId = int.Parse(User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
             var result = await _participationService.SubmitParticipation(dto, userId);
             return result.Success ? Ok(result) : BadRequest(result.Message);
         }

@@ -16,7 +16,6 @@ namespace SurveyApp.ReportingService.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("public")
                 .HasAnnotation("ProductVersion", "8.0.25")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -35,18 +34,22 @@ namespace SurveyApp.ReportingService.Migrations
 
                     b.Property<string>("OptionText")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("QuestionText")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<int>("SurveyId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Statistics", "public");
+                    b.HasIndex("SurveyId");
+
+                    b.ToTable("SurveyStatistics");
                 });
 #pragma warning restore 612, 618
         }
