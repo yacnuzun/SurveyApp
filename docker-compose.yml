@@ -1,0 +1,160 @@
+version: '3.8'
+
+services:
+
+  # =====================
+  # PostgreSQL — 4 ayrı DB
+  # =====================
+  postgres:
+    image: postgres:16-alpine
+    container_name: surveyapp-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - surveyapp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =====================
+  # RabbitMQ
+  # =====================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: surveyapp-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - surveyapp-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =====================
+  # IdentityService
+  # =====================
+  identity-service:
+    build:
+      context: ./backend
+      dockerfile: services/SurveyApp.IdentityService/Dockerfile
+    container_name: surveyapp-identity
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=surveyapp_identity;Username=postgres;Password=postgres123
+    ports:
+      - "7220:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - surveyapp-network
+
+  # =====================
+  # SurveyManagement
+  # =====================
+  survey-management:
+    build:
+      context: ./backend
+      dockerfile: services/SurveyApp.SurveyManagement/Dockerfile
+    container_name: surveyapp-management
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=surveyapp_management;Username=postgres;Password=postgres123
+    ports:
+      - "7158:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - surveyapp-network
+
+  # =====================
+  # SurveyFollow
+  # =====================
+  survey-follow:
+    build:
+      context: ./backend
+      dockerfile: services/SurveyApp.SurveyFollow/Dockerfile
+    container_name: surveyapp-follow
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=surveyapp_follow;Username=postgres;Password=postgres123
+      - RabbitOptions__Url=amqp://rabbitmq
+      - RabbitOptions__User=guest
+      - RabbitOptions__Password=guest
+    ports:
+      - "7138:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - surveyapp-network
+
+  # =====================
+  # ReportingService
+  # =====================
+  reporting-service:
+    build:
+      context: ./backend
+      dockerfile: services/SurveyApp.ReportingService/Dockerfile
+    container_name: surveyapp-reporting
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=surveyapp_reporting;Username=postgres;Password=postgres123
+      - RabbitOptions__Url=amqp://rabbitmq
+      - RabbitOptions__User=guest
+      - RabbitOptions__Password=guest
+    ports:
+      - "7025:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - surveyapp-network
+
+  # =====================
+  # Frontend
+  # =====================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: surveyapp-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - identity-service
+      - survey-management
+      - survey-follow
+      - reporting-service
+    networks:
+      - surveyapp-network
+
+networks:
+  surveyapp-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -22,5 +22,13 @@ namespace SurveyApp.Shared.Constant
         public static string RoleNotFound = "Rol bulunamadı.";
         public static string SurveySuccessCreated =  "Anket başarıyla oluşturuldu.";
         public static string SurveySuccessCompleted = "Anket başarıyla tamamlandı.";
+        public static string SurveyUpdated = ""; 
+        public static string AnswerTemplateCreated = "";
+        public static string AnswerTemplateDeleted = "";
+        public static string AnswerTemplateUpdated = "";
+        public static string QuestionCreated = ""; 
+        public static string QuestionDeleted = ""; 
+        public static string SurveyDeleted = "";
+        public static string QuestionUpdated = ""; 
     }
 }

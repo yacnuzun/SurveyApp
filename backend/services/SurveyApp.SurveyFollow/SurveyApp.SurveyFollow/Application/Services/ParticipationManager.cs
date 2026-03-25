@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
+using MassTransit;
 using SurveyApp.Shared.Constant;
+using SurveyApp.Shared.Events;
 using SurveyApp.Shared.Helpers.ResponseModels.GenericResultModels;
 using SurveyApp.Shared.Persistance.Interfaces;
 using SurveyApp.SurveyFollow.Application.Dto_s;
@@ -13,14 +15,21 @@ namespace SurveyApp.SurveyFollow.Application.Services
     {
         private readonly IParticipationRepository _participationRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<ParticipationForCreateDto> _validator;
+        private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<ParticipationManager> _log;
-        private readonly IValidator<ParticipationForCreateDto> _participationValidator;
 
-        public ParticipationManager(IParticipationRepository participationRepository, IUnitOfWork unitOfWork, IValidator<ParticipationForCreateDto> participationValidator, ILogger<ParticipationManager> log)
+        public ParticipationManager(
+            IParticipationRepository participationRepository,
+            IUnitOfWork unitOfWork,
+            IValidator<ParticipationForCreateDto> validator,
+            IPublishEndpoint publishEndpoint,
+            ILogger<ParticipationManager> log)
         {
             _participationRepository = participationRepository;
             _unitOfWork = unitOfWork;
-            _participationValidator = participationValidator;
+            _validator = validator;
+            _publishEndpoint = publishEndpoint;
             _log = log;
         }
 
@@ -28,14 +37,17 @@ namespace SurveyApp.SurveyFollow.Application.Services
         {
             try
             {
-                var validationResult = await _participationValidator.ValidateAsync(dto);
+                // Validasyon
+                var validationResult = await _validator.ValidateAsync(dto);
                 if (!validationResult.IsValid)
                     return new ErrorResult(string.Join(", ", validationResult.Errors.Select(x => x.ErrorMessage)));
 
-                var alreadyParticipated = await _participationRepository.GetAsync(p => p.UserId == userId && p.SurveyId == dto.SurveyId);
-                if (alreadyParticipated is not null)
+                // Tekrar doldurma engeli
+                var alreadyParticipated = await _participationRepository.HasUserParticipatedAsync(dto.SurveyId, userId);
+                if (alreadyParticipated)
                     return new ErrorResult("Bu anketi daha önce doldurdunuz.");
 
+                // Kaydet
                 var participation = new Participation
                 {
                     SurveyId = dto.SurveyId,
@@ -52,14 +64,28 @@ namespace SurveyApp.SurveyFollow.Application.Services
                 await _participationRepository.AddAsync(participation);
                 await _unitOfWork.CommitAsync();
 
+                await _publishEndpoint.Publish<ISurveySubmittedEvent>(new
+                {
+                    SurveyId = dto.SurveyId,
+                    SubmittedAt = DateTime.UtcNow,
+                    Answers = dto.Answers.Select(a => new
+                    {
+                        a.QuestionId,
+                        a.QuestionText,   
+                        a.OptionId,
+                        a.OptionText,     
+                        a.TextAnswer
+                    })
+                });
+
+
                 return new SuccesResult(Messages.SurveySuccessCompleted);
             }
             catch (Exception ex)
             {
-                _log.LogError(ex.Message);
+                _log.LogError(ex, "SubmitParticipation hata: {Message}", ex.Message);
                 throw;
             }
-            
         }
     }
 }

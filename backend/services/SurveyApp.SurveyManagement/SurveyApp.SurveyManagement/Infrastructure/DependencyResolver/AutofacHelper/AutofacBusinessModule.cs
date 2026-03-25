@@ -21,18 +21,26 @@ namespace SurveyApp.SurveyManagement.Infrastructure.DependencyResolver.AutofacHe
 
             #region services
             builder.RegisterType<SurveyManager>().As<ISurveyService>().InstancePerLifetimeScope();
+            builder.RegisterType<AnswerTemplateManager>().As<IAnswerTemplateService>().InstancePerLifetimeScope();
+            builder.RegisterType<QuestionManager>().As<IQuestionService>().InstancePerLifetimeScope();
             #endregion
 
             builder.RegisterType<EfUnitOfWork<SurveyManagementDbContext>>().As<IUnitOfWork>().InstancePerLifetimeScope();
 
             #region repos
             builder.RegisterType<SurveyRepository>().As<ISurveyRepository>();
-            builder.RegisterType<OptionRepository>().As<IOptionRepository>();
             builder.RegisterType<QuestionRepository>().As<IQuestionRepository>();
+            builder.RegisterType<AnswerTemplateRepository>().As<IAnswerTemplateRepository>();
+            builder.RegisterType<SurveyUserRepository>().As<ISurveyUserRepository>();
+            builder.RegisterType<SurveyQuestionRepository>().As<ISurveyQuestionRepository>();
+            builder.RegisterType<TemplateOptionRepository>().As<ITemplateOptionRepository>();
             #endregion
 
             #region validators
             builder.RegisterType<SurveyForCreateDtoValidator>().As<IValidator<SurveyForCreateDto>>().InstancePerLifetimeScope();
+            builder.RegisterType<AnswerTemplateForCreateDtoValidator>().As<IValidator<AnswerTemplateForCreateDto>>().InstancePerLifetimeScope();
+            builder.RegisterType<QuestionForCreateDtoValidator>().As<IValidator<QuestionForCreateDto>>().InstancePerLifetimeScope();
+            
             #endregion
             builder.Register(context =>
             {

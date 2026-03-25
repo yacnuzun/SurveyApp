@@ -17,13 +17,12 @@ namespace SurveyApp.SurveyManagement.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("public")
                 .HasAnnotation("ProductVersion", "8.0.25")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.Option", b =>
+            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.AnswerTemplate", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -34,24 +33,17 @@ namespace SurveyApp.SurveyManagement.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Text")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("OptionCount")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("Options", "public");
+                    b.ToTable("AnswerTemplates");
                 });
 
             modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.Question", b =>
@@ -62,30 +54,28 @@ namespace SurveyApp.SurveyManagement.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AnswerTemplateId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
 
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
-                    b.Property<int>("SurveyId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SurveyId");
+                    b.HasIndex("AnswerTemplateId");
 
-                    b.ToTable("Questions", "public");
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.Survey", b =>
@@ -99,12 +89,13 @@ namespace SurveyApp.SurveyManagement.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("CreatedBy")
+                    b.Property<int>("CreatedByAdminId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
@@ -112,36 +103,127 @@ namespace SurveyApp.SurveyManagement.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Surveys", "public");
+                    b.ToTable("Surveys");
                 });
 
-            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.Option", b =>
+            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.SurveyQuestion", b =>
                 {
-                    b.HasOne("SurveyApp.SurveyManagement.Domain.Entities.Question", "Question")
-                        .WithMany("Options")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                    b.Navigation("Question");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SurveyId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("SurveyId", "QuestionId")
+                        .IsUnique();
+
+                    b.ToTable("SurveyQuestions");
+                });
+
+            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.SurveyUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("SurveyId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SurveyId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("SurveyUsers");
+                });
+
+            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.TemplateOption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AnswerTemplateId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnswerTemplateId");
+
+                    b.ToTable("TemplateOptions");
                 });
 
             modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.Question", b =>
                 {
-                    b.HasOne("SurveyApp.SurveyManagement.Domain.Entities.Survey", "Survey")
+                    b.HasOne("SurveyApp.SurveyManagement.Domain.Entities.AnswerTemplate", "AnswerTemplate")
                         .WithMany("Questions")
+                        .HasForeignKey("AnswerTemplateId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AnswerTemplate");
+                });
+
+            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.SurveyQuestion", b =>
+                {
+                    b.HasOne("SurveyApp.SurveyManagement.Domain.Entities.Question", "Question")
+                        .WithMany("SurveyQuestions")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SurveyApp.SurveyManagement.Domain.Entities.Survey", "Survey")
+                        .WithMany("SurveyQuestions")
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+
+                    b.Navigation("Survey");
+                });
+
+            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.SurveyUser", b =>
+                {
+                    b.HasOne("SurveyApp.SurveyManagement.Domain.Entities.Survey", "Survey")
+                        .WithMany("AssignedUsers")
                         .HasForeignKey("SurveyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -149,14 +231,34 @@ namespace SurveyApp.SurveyManagement.Migrations
                     b.Navigation("Survey");
                 });
 
-            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.Question", b =>
+            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.TemplateOption", b =>
+                {
+                    b.HasOne("SurveyApp.SurveyManagement.Domain.Entities.AnswerTemplate", "AnswerTemplate")
+                        .WithMany("Options")
+                        .HasForeignKey("AnswerTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AnswerTemplate");
+                });
+
+            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.AnswerTemplate", b =>
                 {
                     b.Navigation("Options");
+
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.Question", b =>
+                {
+                    b.Navigation("SurveyQuestions");
                 });
 
             modelBuilder.Entity("SurveyApp.SurveyManagement.Domain.Entities.Survey", b =>
                 {
-                    b.Navigation("Questions");
+                    b.Navigation("AssignedUsers");
+
+                    b.Navigation("SurveyQuestions");
                 });
 #pragma warning restore 612, 618
         }

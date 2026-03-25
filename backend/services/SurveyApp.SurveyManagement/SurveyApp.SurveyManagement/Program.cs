@@ -2,10 +2,12 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SurveyApp.Shared.Helpers.Security.Encryption;
 using SurveyApp.Shared.Helpers.Security.Security;
+using SurveyApp.SurveyManagement.Infrastructure.Data;
 using SurveyApp.SurveyManagement.Infrastructure.DependencyResolver.AutofacHelper;
 
 namespace SurveyApp.SurveyManagement
@@ -66,7 +68,18 @@ namespace SurveyApp.SurveyManagement
                                     IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
                                 };
                             });
+            var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("FrontendPolicy", policy =>
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -77,13 +90,17 @@ namespace SurveyApp.SurveyManagement
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("FrontendPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
 
 
             app.MapControllers();
-
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<SurveyManagementDbContext>();
+                db.Database.Migrate();
+            }
             app.Run();
         }
     }
