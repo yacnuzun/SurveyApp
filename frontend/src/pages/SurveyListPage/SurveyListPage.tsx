@@ -1,6 +1,8 @@
+// src/pages/SurveyListPage/SurveyListPage.tsx
+
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchActiveSurveys } from '../../store/surveySlice';
+import { fetchMySurveys, fetchActiveSurveys } from '../../store/surveySlice';
 import type { AppDispatch, RootState } from '../../store/appStore';
 import type { Survey } from '../../types/Survey';
 import { useNavigate } from 'react-router-dom';
@@ -12,12 +14,15 @@ const SurveyListPage = () => {
   const { surveys, isLoading, error } = useSelector((state: RootState) => state.survey);
   const { user } = useSelector((state: RootState) => state.auth);
 
-  // Admin kontrolü
   const isAdmin = user?.roles?.some((r: string) => r.toLowerCase() === 'admin');
 
   useEffect(() => {
-    dispatch(fetchActiveSurveys());
-  }, [dispatch]);
+    if (isAdmin) {
+      dispatch(fetchActiveSurveys());
+    } else {
+      dispatch(fetchMySurveys());
+    }
+  }, [dispatch, isAdmin]);
 
   if (isLoading) return <div className="loader">Anketler yükleniyor...</div>;
   if (error) return <div className="error-msg">{error}</div>;
@@ -25,8 +30,12 @@ const SurveyListPage = () => {
   return (
     <div className="survey-list-container">
       <header className="survey-header">
-        <h1>Aktif Anketler</h1>
-        <p>Görüşleriniz bizim için değerli! Bir anket seçin ve hemen doldurun.</p>
+        <h1>{isAdmin ? 'Aktif Anketler' : 'Anketlerim'}</h1>
+        <p>
+          {isAdmin
+            ? 'Sistemdeki tüm aktif anketler.'
+            : 'Size atanmış aktif anketler. Görüşleriniz bizim için değerli!'}
+        </p>
       </header>
 
       <div className="survey-grid">
@@ -37,15 +46,12 @@ const SurveyListPage = () => {
                 <h3>{survey.title}</h3>
                 <p>{survey.description}</p>
               </div>
-
               <button
                 className="join-button"
                 onClick={() => navigate(`/survey-detail/${survey.id}`)}
               >
                 Katıl
               </button>
-
-              {/* Sadece admin görebilir */}
               {isAdmin && (
                 <button
                   className="report-btn"
@@ -57,7 +63,9 @@ const SurveyListPage = () => {
             </div>
           ))
         ) : (
-          <p className="no-data">Şu an aktif bir anket bulunmuyor.</p>
+          <p className="no-data">
+            {isAdmin ? 'Aktif anket bulunmuyor.' : 'Size atanmış aktif anket bulunmuyor.'}
+          </p>
         )}
       </div>
     </div>

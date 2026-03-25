@@ -18,18 +18,6 @@ export interface AuthResponse {
   token: AccessToken; // Bu bir nesne, direkt string değil!
 }
 
-interface AuthState {
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    roles: string[];
-  } | null;
-  token: string | null;
-  isLoading: boolean;
-  error: string | null;
-}
-
 export interface LoginRequest {
   email: string;
   password: string;

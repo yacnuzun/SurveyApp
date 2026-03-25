@@ -29,7 +29,12 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: null,
+  user: (() => {
+    try {
+      const u = localStorage.getItem('user');
+      return u ? JSON.parse(u) : null;
+    } catch { return null; }
+  })(),
   token: localStorage.getItem('token'),
   isLoading: false,
   error: null,
@@ -52,17 +57,18 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(login.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
-        const { role, email, userName, userId, token } = action.payload;
-        state.isLoading = false;
-        state.token = token.token;
-        state.user = {
-          id: userId,
-          name: userName,
-          email: email,
-          roles: role,
-        };
-        state.error = null;
-      })
+  const { role, email, userName, userId, token } = action.payload;
+  state.isLoading = false;
+  state.token = token.token;
+  state.user = { id: userId, name: userName, email, roles: role };
+  state.error = null;
+
+  // ← bu iki satırı ekle
+  localStorage.setItem('token', token.token);
+  localStorage.setItem('user', JSON.stringify({
+    id: userId, name: userName, email, roles: role
+  }));
+})
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;

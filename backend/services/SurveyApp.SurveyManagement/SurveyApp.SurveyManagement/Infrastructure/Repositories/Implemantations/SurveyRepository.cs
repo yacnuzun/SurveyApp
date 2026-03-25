@@ -14,36 +14,43 @@ namespace SurveyApp.SurveyManagement.Infrastructure.Repositories.Implemantations
         public async Task<Survey?> GetWithQuestionsAsync(int id)
         {
             return await Context.Surveys
-                .Include(s => s.SurveyQuestions)
-                    .ThenInclude(sq => sq.Question)
-                        .ThenInclude(q => q.AnswerTemplate)
-                            .ThenInclude(t => t.Options.OrderBy(o => o.Order))
-                            .Include(s => s.AssignedUsers)
-                .FirstOrDefaultAsync(s => s.Id == id);
+        .Include(s => s.SurveyQuestions)
+            .ThenInclude(sq => sq.Question)
+                .ThenInclude(q => q.AnswerTemplate)
+                    .ThenInclude(t => t.Options.OrderBy(o => o.Order))
+        .Include(s => s.AssignedUsers)  
+        .FirstOrDefaultAsync(s => s.Id == id);
+
         }
 
         public async Task<List<Survey>> GetAllWithDetailsAsync()
         {
             return await Context.Surveys
-                .Include(s => s.SurveyQuestions)
-                .Include(s => s.AssignedUsers)
-                .ToListAsync();
+        .Include(s => s.SurveyQuestions)
+            .ThenInclude(sq => sq.Question)
+                .ThenInclude(q => q.AnswerTemplate)
+                    .ThenInclude(t => t.Options.OrderBy(o => o.Order))
+        .Include(s => s.AssignedUsers)
+        .Where(s => s.IsActive && s.EndDate > DateTime.UtcNow)
+        .ToListAsync();
+
         }
 
         public async Task<List<Survey>> GetAssignedSurveysForUserAsync(int userId)
         {
             return await Context.Surveys
-                .Include(s => s.SurveyQuestions)
-                    .ThenInclude(sq => sq.Question)
-                        .ThenInclude(q => q.AnswerTemplate)
-                            .ThenInclude(t => t.Options.OrderBy(o => o.Order))
-                            .Include(s => s.AssignedUsers)
-                .Where(s =>
-                    s.IsActive &&
-                    s.StartDate <= DateTime.UtcNow &&
-                    s.EndDate >= DateTime.UtcNow &&
-                    s.AssignedUsers.Any(u => u.UserId == userId))
-                .ToListAsync();
+        .Include(s => s.SurveyQuestions)
+            .ThenInclude(sq => sq.Question)
+                .ThenInclude(q => q.AnswerTemplate)
+                    .ThenInclude(t => t.Options.OrderBy(o => o.Order))
+        .Include(s => s.AssignedUsers)  
+        .Where(s =>
+            s.IsActive &&
+            s.StartDate <= DateTime.UtcNow &&
+            s.EndDate >= DateTime.UtcNow &&
+            s.AssignedUsers.Any(u => u.UserId == userId))
+        .ToListAsync();
+
         }
 
     }

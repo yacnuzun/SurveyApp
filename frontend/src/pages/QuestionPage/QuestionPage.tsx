@@ -7,7 +7,7 @@ import { fetchTemplates } from '../../store/answerTemplateSlice';
 import type { AppDispatch, RootState } from '../../store/appStore';
 import type { Question, QuestionCreateDto } from '../../types/Survey';
 import { QuestionType } from '../../types/Survey';
-//import './QuestionPage.css';
+import '../Shared/crud.css';
 
 const typeLabels: Record<QuestionType, string> = {
   [QuestionType.Single]: 'Tekli Seçim',

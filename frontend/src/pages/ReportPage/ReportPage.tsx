@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useReportStore } from '../../store/useReportStore';
+import { useEffect } from 'react';
+import { useReportStore } from '../../hooks/useReportStore';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import './ReportPage.css';

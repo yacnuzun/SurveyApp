@@ -13,23 +13,16 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Form gönderim fonksiyonu
-  const handleSubmit = async (e: React.FormEvent) => {
+ const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   const resultAction = await dispatch(login({ email, password }));
 
   if (login.fulfilled.match(resultAction)) {
-    // Backend'den 'Role' (büyük harf veya küçük harf JSON'a göre değişir) geliyor
-    const roles = resultAction.payload.role as string[]; 
-
-    // Admin mi kontrolü (.some() kullanımı)
+    const roles = resultAction.payload.role as string[];
     const isAdmin = roles.some((r: string) => r.toLowerCase() === 'admin');
-
-    if (isAdmin) {
-      navigate('/admin/create-survey');
-    } else {
-      navigate('/surveys');
-    }
+    navigate(isAdmin ? '/admin/surveys' : '/surveys');
+  } else if (login.rejected.match(resultAction)) {
+    alert(resultAction.payload as string); // ← hata mesajını göster
   }
 };
 
@@ -71,8 +64,8 @@ const LoginPage = () => {
           </form>
 
           <div className="login-footer">
-            <p>Admin: admin@example.com / admin123</p>
-            <p>User: user@example.com / user123</p>
+            <p>Admin: admin@surveyapp.com / Admin123!</p>
+            <p>User: user1@surveyapp.com / User123!</p>
           </div>
         </div>
       </div>

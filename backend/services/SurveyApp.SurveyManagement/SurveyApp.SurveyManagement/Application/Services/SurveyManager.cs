@@ -150,11 +150,13 @@ namespace SurveyApp.SurveyManagement.Application.Services
             return new SuccesResult(survey.IsActive ? "Anket aktifleştirildi." : "Anket pasife alındı.");
         }
 
-        public async Task<IDataResult<List<Survey>>> GetAllActiveSurveys()
+        public async Task<IDataResult<List<SurveyDetailDto>>> GetAllActiveSurveys()
         {
-            var result = await _surveyRepository.ListAsync(s =>
-                s.IsActive && s.EndDate > DateTime.UtcNow);
-            return new SuccessDataResult<List<Survey>>(result.ToList());
+            var surveys = await _surveyRepository.GetAllWithDetailsAsync();
+            return new SuccessDataResult<List<SurveyDetailDto>>(
+                surveys.Select(MapToDetailDto).ToList()
+            );
+
         }
 
         public async Task<IDataResult<SurveyDetailDto>> GetSurveywithId(int id)
@@ -175,6 +177,10 @@ namespace SurveyApp.SurveyManagement.Application.Services
             Id = s.Id,
             Title = s.Title,
             Description = s.Description,
+            StartDate = s.StartDate,    
+            EndDate = s.EndDate,        
+            IsActive = s.IsActive,
+            AssignedUserIds = s.AssignedUsers.Select(u => u.UserId).ToList(),
             Questions = s.SurveyQuestions.OrderBy(sq => sq.Order).Select(sq => new QuestionDetailDto
             {
                 Id = sq.Question.Id,

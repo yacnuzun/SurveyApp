@@ -1,3 +1,5 @@
+// src/pages/SurveyDetailPage/SurveyDetailPage.tsx
+
 import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,25 +27,41 @@ const SurveyDetailPage = () => {
   };
 
   const handleFinish = async () => {
-    if (!currentSurvey) return;
+  if (!currentSurvey) return;
 
-    const formattedAnswers = Object.entries(answers).map(([qId, val]) => ({
-      questionId: parseInt(qId),
-      optionId: typeof val === 'number' ? val : null,
-      textAnswer: typeof val === 'string' ? val : null,
-    }));
+  const formattedAnswers = Object.entries(answers).map(([qId, val]) => {
+    const question = currentSurvey.questions.find(q => q.id === parseInt(qId));
+    const questionText = question?.text ?? '';
 
-    const payload = {
-      surveyId: currentSurvey.id,
-      answers: formattedAnswers,
-    };
+    let optionId: number | null = null;
+    let optionText: string | null = null;
+    let textAnswer: string | null = null;
 
-    const result = await dispatch(submitSurveyAnswers(payload));
-    if (submitSurveyAnswers.fulfilled.match(result)) {
-      alert('Anket başarıyla gönderildi!');
-      navigate('/surveys');
+    if (typeof val === 'number') {
+      optionId = val;
+      optionText = question?.options?.find(o => o.id === val)?.text ?? null;
+    } else if (Array.isArray(val)) {
+      optionId = val[0] ?? null;
+      optionText = question?.options?.find(o => o.id === optionId)?.text ?? null;
+    } else if (typeof val === 'string') {
+      textAnswer = val;
     }
-  };
+
+    return { questionId: parseInt(qId), questionText, optionId, optionText, textAnswer };
+  });
+
+  const result = await dispatch(submitSurveyAnswers({
+    surveyId: currentSurvey.id,
+    answers: formattedAnswers,
+  }));
+
+  if (submitSurveyAnswers.fulfilled.match(result)) {
+    alert('Anket başarıyla gönderildi!');
+    navigate('/surveys');
+  } else if (submitSurveyAnswers.rejected.match(result)) {
+    alert(result.payload as string); // ← hata mesajı
+  }
+};
 
   if (isLoading || !currentSurvey) return <div className="survey-loading">Yükleniyor...</div>;
 
@@ -57,7 +75,6 @@ const SurveyDetailPage = () => {
         <div key={q.id} className="question-block">
           <h4>{q.text}</h4>
 
-          {/* Metin sorusu */}
           {q.type === QuestionType.Text && (
             <input
               type="text"
@@ -67,19 +84,13 @@ const SurveyDetailPage = () => {
             />
           )}
 
-          {/* Tekli seçim (Radio) */}
           {q.type === QuestionType.Single && q.options?.map((opt) => (
             <label key={opt.id} className="option-label">
-              <input
-                type="radio"
-                name={`q-${q.id}`}
-                onChange={() => handleInputChange(q.id, opt.id)}
-              />
+              <input type="radio" name={`q-${q.id}`} onChange={() => handleInputChange(q.id, opt.id)} />
               <span className="option-text">{opt.text}</span>
             </label>
           ))}
 
-          {/* Çoklu seçim (Checkbox) */}
           {q.type === QuestionType.Multi && q.options?.map((opt) => (
             <label key={opt.id} className="option-label">
               <input
@@ -98,11 +109,7 @@ const SurveyDetailPage = () => {
         </div>
       ))}
 
-      <button
-        className="btn-finish"
-        onClick={handleFinish}
-        disabled={isSubmitting}
-      >
+      <button className="btn-finish" onClick={handleFinish} disabled={isSubmitting}>
         {isSubmitting ? 'Gönderiliyor...' : 'Anketi Bitir'}
       </button>
     </div>

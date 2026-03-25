@@ -29,6 +29,16 @@ namespace SurveyApp.SurveyManagement.WebApi.Controllers
             return result.Success ? Ok(result) : BadRequest(result.Message);
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create(SurveyForCreateDto dto)
+        {
+            var adminId = Convert.ToInt32(User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var result = await _surveyService.CreateAsync(dto, adminId);
+            return result.Success ? Ok(result) : BadRequest(result.Message);
+        }
+
         [HttpGet("get-all-active")]
         [Authorize]
         public async Task<IActionResult> GetAllActive()

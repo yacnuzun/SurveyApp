@@ -1,45 +1,52 @@
-// src/store/questionSlice.ts
-
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api/axiosConfig';
 import type { Question, QuestionCreateDto, QuestionUpdateDto } from '../types/Survey';
+import axios from 'axios';
+import { API_URLS } from '../api/apiConfig';
+
+ 
+const mgmt = axios.create({ baseURL: API_URLS.management });
+mgmt.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 export const fetchQuestions = createAsyncThunk('question/fetchAll', async (_, { rejectWithValue }) => {
   try {
-    const res = await api.get<Question[]>('Questions');
+    const res = await mgmt.get<Question[]>('Questions');
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Sorular yüklenemedi');
   }
 });
-
+ 
 export const createQuestion = createAsyncThunk('question/create', async (dto: QuestionCreateDto, { rejectWithValue }) => {
   try {
-    const res = await api.post<Question>('Questions', dto);
+    const res = await mgmt.post<Question>('Questions', dto);
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Soru oluşturulamadı');
   }
 });
-
+ 
 export const updateQuestion = createAsyncThunk('question/update', async (dto: QuestionUpdateDto, { rejectWithValue }) => {
   try {
-    const res = await api.put<Question>(`Questions/${dto.id}`, dto);
+    const res = await mgmt.put<Question>(`Questions/${dto.id}`, dto);
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Soru güncellenemedi');
   }
 });
-
+ 
 export const deleteQuestion = createAsyncThunk('question/delete', async (id: number, { rejectWithValue }) => {
   try {
-    await api.delete(`Questions/${id}`);
+    await mgmt.delete(`Questions/${id}`);
     return id;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Soru silinemedi');
   }
 });
-
+ 
 const questionSlice = createSlice({
   name: 'question',
   initialState: {
@@ -63,5 +70,5 @@ const questionSlice = createSlice({
       });
   },
 });
-
+ 
 export default questionSlice.reducer;

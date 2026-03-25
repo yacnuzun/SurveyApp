@@ -1,45 +1,51 @@
-// src/store/answerTemplateSlice.ts
-
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api/axiosConfig';
-import type { AnswerTemplate, AnswerTemplateCreateDto, AnswerTemplateUpdateDto } from '../types/Answertemplate';
-
+import axios from 'axios';
+import { API_URLS } from '../api/apiConfig';
+import type { AnswerTemplate, AnswerTemplateCreateDto, AnswerTemplateUpdateDto } from '../types/AnswerTemplate';
+ 
+const mgmt = axios.create({ baseURL: API_URLS.management });
+mgmt.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+ 
 export const fetchTemplates = createAsyncThunk('answerTemplate/fetchAll', async (_, { rejectWithValue }) => {
   try {
-    const res = await api.get<AnswerTemplate[]>('AnswerTemplates');
+    const res = await mgmt.get<AnswerTemplate[]>('AnswerTemplates');
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Şablonlar yüklenemedi');
   }
 });
-
+ 
 export const createTemplate = createAsyncThunk('answerTemplate/create', async (dto: AnswerTemplateCreateDto, { rejectWithValue }) => {
   try {
-    const res = await api.post('AnswerTemplates', dto);
+    const res = await mgmt.post('AnswerTemplates', dto);
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Şablon oluşturulamadı');
   }
 });
-
+ 
 export const updateTemplate = createAsyncThunk('answerTemplate/update', async (dto: AnswerTemplateUpdateDto, { rejectWithValue }) => {
   try {
-    const res = await api.put(`AnswerTemplates/${dto.id}`, dto);
+    const res = await mgmt.put(`AnswerTemplates/${dto.id}`, dto);
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Şablon güncellenemedi');
   }
 });
-
+ 
 export const deleteTemplate = createAsyncThunk('answerTemplate/delete', async (id: number, { rejectWithValue }) => {
   try {
-    await api.delete(`AnswerTemplates/${id}`);
+    await mgmt.delete(`AnswerTemplates/${id}`);
     return id;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Şablon silinemedi');
   }
 });
-
+ 
 const answerTemplateSlice = createSlice({
   name: 'answerTemplate',
   initialState: {
@@ -63,5 +69,5 @@ const answerTemplateSlice = createSlice({
       });
   },
 });
-
+ 
 export default answerTemplateSlice.reducer;

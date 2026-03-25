@@ -4,10 +4,12 @@ using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SurveyApp.Shared.Helpers.Security.Encryption;
 using SurveyApp.Shared.Helpers.Security.Security;
+using SurveyApp.SurveyFollow.Infrastructure.Data;
 using SurveyApp.SurveyFollow.Infrastructure.DependencyResolver.AutofacHelper;
 
 namespace SurveyApp.SurveyFollow
@@ -107,7 +109,11 @@ namespace SurveyApp.SurveyFollow
 
 
             app.MapControllers();
-
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ParticipationDbContext>();
+                db.Database.Migrate();
+            }
             app.Run();
         }
     }

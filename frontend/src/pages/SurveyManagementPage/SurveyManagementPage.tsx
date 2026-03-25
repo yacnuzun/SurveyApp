@@ -31,7 +31,9 @@ const SurveyManagementPage = () => {
   const [userIdInput, setUserIdInput] = useState('');
 
   useEffect(() => {
-    dispatch(fetchActiveSurveys());
+    dispatch(fetchActiveSurveys()).then((res: any) => {
+    console.log('surveys response:', res.payload);
+  });
     dispatch(fetchQuestions());
   }, [dispatch]);
 
@@ -77,21 +79,23 @@ const SurveyManagementPage = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingId !== null) {
-      const survey = surveys.find(s => s.id === editingId);
-      await dispatch(updateSurvey({ ...form, id: editingId, isActive: survey?.isActive ?? true }));
-    } else {
-      await dispatch(createSurvey(form));
-    }
-    handleCancel();
-  };
+  e.preventDefault();
+  if (editingId !== null) {
+    const survey = surveys.find(s => s.id === editingId);
+    await dispatch(updateSurvey({ ...form, id: editingId, isActive: survey?.isActive ?? true }));
+  } else {
+    await dispatch(createSurvey(form));
+  }
+  handleCancel();
+  dispatch(fetchActiveSurveys()); // ← ekle
+};
 
-  const handleDelete = (id: number) => {
-    if (window.confirm('Bu anketi silmek istediğinize emin misiniz?')) {
-      dispatch(deleteSurvey(id));
-    }
-  };
+const handleDelete = async (id: number) => {
+  if (window.confirm('Bu anketi silmek istediğinize emin misiniz?')) {
+    await dispatch(deleteSurvey(id));
+    dispatch(fetchActiveSurveys()); // ← ekle
+  }
+};
 
   return (
     <div className="crud-page">
@@ -190,9 +194,9 @@ const SurveyManagementPage = () => {
                 <h3>{s.title}</h3>
                 <p>{s.description}</p>
                 <div className="survey-meta">
-                  <span>📅 {s.startDate.split('T')[0]} — {s.endDate.split('T')[0]}</span>
-                  <span>❓ {s.questions.length} soru</span>
-                  <span>👥 {s.assignedUserIds.length} kullanıcı</span>
+                  <span>📅 {s.startDate?.split('T')[0] ?? '-'} — {s.endDate?.split('T')[0] ?? '-'}</span>
+                  <span>❓ {s.questions?.length ?? 0} soru</span>
+                  <span>👥 {s.assignedUserIds?.length ?? 0} kullanıcı</span>
                 </div>
               </div>
               <span className={`status-badge ${s.isActive ? 'active' : 'passive'}`}>
@@ -202,11 +206,15 @@ const SurveyManagementPage = () => {
             <div className="survey-mgmt-actions">
               <button className="btn-edit" onClick={() => handleEdit(s)}>Düzenle</button>
               <button
-                className={s.isActive ? 'btn-ghost' : 'btn-primary-sm'}
-                onClick={() => dispatch(toggleSurveyActive(s.id))}
-              >
-                {s.isActive ? 'Pasife Al' : 'Aktifleştir'}
-              </button>
+  className={s.isActive ? 'btn-ghost' : 'btn-primary-sm'}
+  onClick={async () => {
+    if (!s.id) return;
+    await dispatch(toggleSurveyActive(s.id));
+    dispatch(fetchActiveSurveys()); // ← liste yenile
+  }}
+>
+  {s.isActive ? 'Pasife Al' : 'Aktifleştir'}
+</button>
               <button className="btn-ghost" onClick={() => navigate(`/admin/surveys/${s.id}/report`)}>Rapor</button>
               <button className="btn-delete" onClick={() => handleDelete(s.id)}>Sil</button>
             </div>

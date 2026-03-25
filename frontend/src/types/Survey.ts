@@ -1,5 +1,5 @@
 // src/types/Survey.ts — GÜNCELLENDİ
-import type { TemplateOption } from './Answertemplate.ts';
+import type { TemplateOption } from './AnswerTemplate';
 
 
 export const QuestionType = {
@@ -25,8 +25,8 @@ export interface Survey {
   startDate: string;
   endDate: string;
   isActive: boolean;
-  assignedUserIds: number[];
-  questions: Question[];
+  assignedUserIds: number[];   
+  questions: Question[];       
 }
 export interface SurveyDetail extends Survey {
   questions: Question[];

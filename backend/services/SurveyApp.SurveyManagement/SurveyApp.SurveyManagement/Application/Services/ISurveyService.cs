@@ -26,9 +26,9 @@ namespace SurveyApp.SurveyManagement.Application.Services
         Task<IResult> UpdateAsync(SurveyForUpdateDto dto);
         Task<IResult> DeleteAsync(int id);
         Task<IResult> ToggleActiveAsync(int id);
-        Task<IDataResult<List<Survey>>> GetAllActiveSurveys();
         Task<IDataResult<SurveyDetailDto>> GetSurveywithId(int id);
         Task<IDataResult<List<SurveyDetailDto>>> GetAssignedSurveysForUser(int userId);
+        Task<IDataResult<List<SurveyDetailDto>>> GetAllActiveSurveys();
     }
 
 }

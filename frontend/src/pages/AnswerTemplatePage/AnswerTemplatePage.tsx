@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTemplates, createTemplate, updateTemplate, deleteTemplate } from '../../store/answerTemplateSlice';
 import type { AppDispatch, RootState } from '../../store/appStore';
-import type { AnswerTemplate, AnswerTemplateCreateDto } from '../../types/Answertemplate';
-//import './AnswerTemplatePage.css';
+import type { AnswerTemplate, AnswerTemplateCreateDto } from '../../types/AnswerTemplate';
+import '../Shared/crud.css';
+
 
 const emptyForm = (): AnswerTemplateCreateDto => ({
   name: '',
@@ -127,10 +128,10 @@ const AnswerTemplatePage = () => {
           <div key={t.id} className="crud-card">
             <div className="crud-card-header">
               <span className="crud-card-title">{t.name}</span>
-              <span className="badge">{t.optionCount} seçenek</span>
+              <span className="badge">{t.optionCount ?? t.options?.length ?? 0} seçenek</span>
             </div>
             <div className="option-chips">
-              {t.options.map(o => <span key={o.id} className="chip">{o.text}</span>)}
+              {t.options?.map(o => <span key={o.id} className="chip">{o.text}</span>)}
             </div>
             <div className="crud-card-actions">
               <button className="btn-edit" onClick={() => handleEdit(t)}>Düzenle</button>

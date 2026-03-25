@@ -1,32 +1,38 @@
-// src/store/surveySlice.ts — GÜNCELLENDİ
+// src/store/surveySlice.ts
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api/axiosConfig';
+import axios from 'axios';
+import { API_URLS } from '../api/apiConfig';
 import type { Survey, SurveyCreateDto, SurveyUpdateDto } from '../types/Survey';
 
-// Admin — tüm aktif anketler
+const mgmt = axios.create({ baseURL: API_URLS.management });
+mgmt.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
 export const fetchActiveSurveys = createAsyncThunk('survey/fetchActive', async (_, { rejectWithValue }) => {
   try {
-    const res = await api.get<Survey[]>('Surveys/get-all-active');
+    const res = await mgmt.get<Survey[]>('Surveys/get-all-active');
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Anketler yüklenemedi');
   }
 });
 
-// SurveyFollow — kullanıcıya atanan anketler
 export const fetchMySurveys = createAsyncThunk('survey/fetchMy', async (_, { rejectWithValue }) => {
   try {
-    const res = await api.get<Survey[]>('Surveys/my-surveys');
+    const res = await mgmt.get<Survey[]>('Surveys/my-surveys');
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Anketleriniz yüklenemedi');
   }
 });
 
-export const createSurvey = createAsyncThunk('survey/create', async (dto: SurveyCreateDto, { rejectWithValue }) => {
+export const createSurvey = createAsyncThunk('Surveys/create-complex', async (dto: SurveyCreateDto, { rejectWithValue }) => {
   try {
-    const res = await api.post('Surveys', dto);
+    const res = await mgmt.post('Surveys', dto);
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Anket oluşturulamadı');
@@ -35,7 +41,7 @@ export const createSurvey = createAsyncThunk('survey/create', async (dto: Survey
 
 export const updateSurvey = createAsyncThunk('survey/update', async (dto: SurveyUpdateDto, { rejectWithValue }) => {
   try {
-    const res = await api.put<Survey>(`Surveys/${dto.id}`, dto);
+    const res = await mgmt.put<Survey>(`Surveys/${dto.id}`, dto);
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Anket güncellenemedi');
@@ -44,7 +50,7 @@ export const updateSurvey = createAsyncThunk('survey/update', async (dto: Survey
 
 export const deleteSurvey = createAsyncThunk('survey/delete', async (id: number, { rejectWithValue }) => {
   try {
-    await api.delete(`Surveys/${id}`);
+    await mgmt.delete(`Surveys/${id}`);
     return id;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Anket silinemedi');
@@ -53,7 +59,7 @@ export const deleteSurvey = createAsyncThunk('survey/delete', async (id: number,
 
 export const toggleSurveyActive = createAsyncThunk('survey/toggle', async (id: number, { rejectWithValue }) => {
   try {
-    await api.patch(`Surveys/${id}/toggle-active`);
+    await mgmt.patch(`Surveys/${id}/toggle-active`);
     return id;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Durum değiştirilemedi');

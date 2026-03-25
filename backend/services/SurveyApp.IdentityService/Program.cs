@@ -1,9 +1,11 @@
-
+﻿
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SurveyApp.IdentityService.Infrastructure.Data;
 using SurveyApp.IdentityService.Infrastructure.DependencyResolver.AutofacHelper;
 using SurveyApp.IdentityService.Infrastructure.Helpers.JWT;
 using SurveyApp.Shared.Helpers.Security.Encryption;
@@ -13,7 +15,7 @@ namespace SurveyApp.IdentityService
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -102,6 +104,13 @@ namespace SurveyApp.IdentityService
             app.UseAuthorization();
 
             app.MapControllers();
+            using (var scope = app.Services.CreateScope())
+            {
+                var lifetimeScope = scope.ServiceProvider.GetRequiredService<ILifetimeScope>();
+                var context = lifetimeScope.Resolve<IdentityDbContext>();
+                context.Database.Migrate();
+                await context.SeedAsync();  
+            }
 
             app.Run();
         }

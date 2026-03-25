@@ -12,6 +12,8 @@ using SurveyApp.Shared.Helpers.Security.Encryption;
 using SurveyApp.Shared.Helpers.Security.Security;
 using SurveyApp.Shared;
 using SurveyApp.ReportingService.Infrastructure.Helpers.Consumer;
+using SurveyApp.ReportingService.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace SurveyApp.ReportingService
 {
@@ -116,7 +118,11 @@ namespace SurveyApp.ReportingService
 
 
             app.MapControllers();
-
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ReportingDbContext>();
+                db.Database.Migrate();
+            }
             app.Run();
         }
     }
