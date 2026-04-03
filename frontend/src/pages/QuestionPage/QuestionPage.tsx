@@ -50,15 +50,19 @@ const QuestionPage = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload = { ...form, answerTemplateId: needsTemplate ? form.answerTemplateId : undefined };
-    if (editingId !== null) {
-      await dispatch(updateQuestion({ ...payload, id: editingId }));
-    } else {
-      await dispatch(createQuestion(payload));
-    }
+  e.preventDefault();
+  const payload = { ...form, answerTemplateId: needsTemplate ? form.answerTemplateId : undefined };
+  let result: any;
+  if (editingId !== null) {
+    result = await dispatch(updateQuestion({ ...payload, id: editingId }));
+  } else {
+    result = await dispatch(createQuestion(payload));
+  }
+  if (result.meta.requestStatus === 'fulfilled') {
     handleCancel();
-  };
+  }
+};
+
 
   const handleDelete = (id: number) => {
     if (window.confirm('Bu soruyu silmek istediğinize emin misiniz?')) {
@@ -84,6 +88,7 @@ const QuestionPage = () => {
               <label>Soru Metni</label>
               <input
                 type="text"
+                maxLength={500}
                 placeholder="Soruyu yazın..."
                 value={form.text}
                 onChange={e => setForm({ ...form, text: e.target.value })}

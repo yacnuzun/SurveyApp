@@ -37,6 +37,14 @@ namespace SurveyApp.SurveyManagement.Application.Services
             _log = log;
         }
 
+        public async Task<IDataResult<List<SurveyDetailDto>>> GetAllSurveys()
+        {
+            var surveys = await _surveyRepository.GetAllWithDetailsForAdminAsync();
+            return new SuccessDataResult<List<SurveyDetailDto>>(
+                 surveys.Select(MapToDetailDto).ToList()
+             );
+        }
+
         public async Task<IResult> CreateAsync(SurveyForCreateDto dto, int adminId)
         {
             try

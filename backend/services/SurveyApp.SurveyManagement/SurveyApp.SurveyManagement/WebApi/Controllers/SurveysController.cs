@@ -29,6 +29,14 @@ namespace SurveyApp.SurveyManagement.WebApi.Controllers
             return result.Success ? Ok(result) : BadRequest(result.Message);
         }
 
+        [HttpGet("get-all-admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllAdmin()
+        {
+            var result = await _surveyService.GetAllSurveys();
+            return result.Success ? Ok(result.Data) : BadRequest(result.Message);
+        }
+
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(SurveyForCreateDto dto)

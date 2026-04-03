@@ -52,14 +52,17 @@ const AnswerTemplatePage = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingId !== null) {
-      await dispatch(updateTemplate({ ...form, id: editingId }));
-    } else {
-      await dispatch(createTemplate(form));
-    }
+  e.preventDefault();
+  let result: any;
+  if (editingId !== null) {
+    result = await dispatch(updateTemplate({ ...form, id: editingId }));
+  } else {
+    result = await dispatch(createTemplate(form));
+  }
+  if (result.meta.requestStatus === 'fulfilled') {
     handleCancel();
-  };
+  }
+};
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Bu şablonu silmek istediğinize emin misiniz?')) {
@@ -83,8 +86,9 @@ const AnswerTemplatePage = () => {
           <form onSubmit={handleSubmit}>
             <div className="field">
               <label>Şablon Adı</label>
-              <input
+              <input 
                 type="text"
+                maxLength={100}
                 placeholder="örn: Evet/Hayır, Memnuniyet Ölçeği"
                 value={form.name}
                 onChange={e => setForm({ ...form, name: e.target.value })}
@@ -98,6 +102,7 @@ const AnswerTemplatePage = () => {
                   <span className="option-num">{i + 1}</span>
                   <input
                     type="text"
+                    maxLength={100}
                     placeholder={`Seçenek ${i + 1}`}
                     value={opt.text}
                     onChange={e => handleOptionChange(i, e.target.value)}

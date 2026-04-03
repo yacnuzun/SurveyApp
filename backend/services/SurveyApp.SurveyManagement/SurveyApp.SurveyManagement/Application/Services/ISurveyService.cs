@@ -22,6 +22,7 @@ namespace SurveyApp.SurveyManagement.Application.Services
     }
     public interface ISurveyService
     {
+        Task<IDataResult<List<SurveyDetailDto>>> GetAllSurveys();
         Task<IResult> CreateAsync(SurveyForCreateDto dto, int adminId);
         Task<IResult> UpdateAsync(SurveyForUpdateDto dto);
         Task<IResult> DeleteAsync(int id);

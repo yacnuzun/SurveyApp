@@ -53,6 +53,16 @@ namespace SurveyApp.SurveyManagement.Infrastructure.Repositories.Implemantations
 
         }
 
+        public async Task<List<Survey>> GetAllWithDetailsForAdminAsync()
+        {
+            return await Context.Surveys
+                .Include(s => s.SurveyQuestions)
+                    .ThenInclude(sq => sq.Question)
+                        .ThenInclude(q => q.AnswerTemplate)
+                            .ThenInclude(t => t.Options.OrderBy(o => o.Order))
+                .Include(s => s.AssignedUsers)
+                .ToListAsync(); // ← filtre yok
+        }
     }
     public class AnswerTemplateRepository : EfRepository<AnswerTemplate, SurveyManagementDbContext>, IAnswerTemplateRepository
     {

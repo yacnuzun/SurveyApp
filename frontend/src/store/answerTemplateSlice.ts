@@ -1,8 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { mgmtApi }  from '../api/axiosConfig';
+import { mgmtApi } from '../api/axiosConfig';
 import type { AnswerTemplate, AnswerTemplateCreateDto, AnswerTemplateUpdateDto } from '../types/AnswerTemplate';
- 
- 
+
 export const fetchTemplates = createAsyncThunk('answerTemplate/fetchAll', async (_, { rejectWithValue }) => {
   try {
     const res = await mgmtApi.get<AnswerTemplate[]>('AnswerTemplates');
@@ -11,34 +10,34 @@ export const fetchTemplates = createAsyncThunk('answerTemplate/fetchAll', async 
     return rejectWithValue(err.response?.data?.message || 'Şablonlar yüklenemedi');
   }
 });
- 
-export const createTemplate = createAsyncThunk('answerTemplate/create', async (dto: AnswerTemplateCreateDto, { rejectWithValue }) => {
+
+export const createTemplate = createAsyncThunk('answerTemplate/create', async (dto: AnswerTemplateCreateDto, { rejectWithValue, dispatch }) => {
   try {
-    const res = await mgmtApi.post('AnswerTemplates', dto);
-    return res.data;
+    await mgmtApi.post('AnswerTemplates', dto);
+    dispatch(fetchTemplates()); // ← liste yenile
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Şablon oluşturulamadı');
   }
 });
- 
-export const updateTemplate = createAsyncThunk('answerTemplate/update', async (dto: AnswerTemplateUpdateDto, { rejectWithValue }) => {
+
+export const updateTemplate = createAsyncThunk('answerTemplate/update', async (dto: AnswerTemplateUpdateDto, { rejectWithValue, dispatch }) => {
   try {
-    const res = await mgmtApi.put(`AnswerTemplates/${dto.id}`, dto);
-    return res.data;
+    await mgmtApi.put(`AnswerTemplates/${dto.id}`, dto);
+    dispatch(fetchTemplates()); // ← liste yenile
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Şablon güncellenemedi');
   }
 });
- 
-export const deleteTemplate = createAsyncThunk('answerTemplate/delete', async (id: number, { rejectWithValue }) => {
+
+export const deleteTemplate = createAsyncThunk('answerTemplate/delete', async (id: number, { rejectWithValue, dispatch }) => {
   try {
     await mgmtApi.delete(`AnswerTemplates/${id}`);
-    return id;
+    dispatch(fetchTemplates()); // ← liste yenile
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Şablon silinemedi');
   }
 });
- 
+
 const answerTemplateSlice = createSlice({
   name: 'answerTemplate',
   initialState: {
@@ -49,18 +48,13 @@ const answerTemplateSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTemplates.pending, (state) => { state.isLoading = true; state.error = null; })
+      .addCase(fetchTemplates.pending,   (state) => { state.isLoading = true; state.error = null; })
       .addCase(fetchTemplates.fulfilled, (state, action) => { state.isLoading = false; state.templates = action.payload; })
-      .addCase(fetchTemplates.rejected, (state, action) => { state.isLoading = false; state.error = action.payload as string; })
-      .addCase(createTemplate.fulfilled, (state, action) => { state.templates.push(action.payload); })
-      .addCase(updateTemplate.fulfilled, (state, action) => {
-        const idx = state.templates.findIndex(t => t.id === action.payload.id);
-        if (idx !== -1) state.templates[idx] = action.payload;
-      })
-      .addCase(deleteTemplate.fulfilled, (state, action) => {
-        state.templates = state.templates.filter(t => t.id !== action.payload);
-      });
+      .addCase(fetchTemplates.rejected,  (state, action) => { state.isLoading = false; state.error = action.payload as string; })
+      .addCase(createTemplate.rejected,  (state, action) => { state.error = action.payload as string; })
+      .addCase(updateTemplate.rejected,  (state, action) => { state.error = action.payload as string; })
+      .addCase(deleteTemplate.rejected,  (state, action) => { state.error = action.payload as string; });
   },
 });
- 
+
 export default answerTemplateSlice.reducer;

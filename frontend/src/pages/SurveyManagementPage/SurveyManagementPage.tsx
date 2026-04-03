@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchActiveSurveys, createSurvey, updateSurvey, deleteSurvey, toggleSurveyActive } from '../../store/surveySlice';
+import { fetchAllSurveysAdmin, createSurvey, updateSurvey, deleteSurvey, toggleSurveyActive } from '../../store/surveySlice';
 import { fetchQuestions } from '../../store/questionSlice';
 import { fetchUsers } from '../../store/userSlice';
 import type { AppDispatch, RootState } from '../../store/appStore';
@@ -35,7 +35,7 @@ const SurveyManagementPage = () => {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchActiveSurveys()).then((res: any) => {
+    dispatch(fetchAllSurveysAdmin()).then((res: any) => {
     console.log('surveys response:', res.payload);
   });
     dispatch(fetchQuestions());
@@ -78,20 +78,27 @@ const SurveyManagementPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
+  if (form.endDate && form.startDate && form.endDate < form.startDate) {
+    alert('Bitiş tarihi başlangıç tarihinden önce olamaz.');
+    return;
+  }
+  let result: any;
   if (editingId !== null) {
     const survey = surveys.find(s => s.id === editingId);
-    await dispatch(updateSurvey({ ...form, id: editingId, isActive: survey?.isActive ?? true }));
+    result = await dispatch(updateSurvey({ ...form, id: editingId, isActive: survey?.isActive ?? true }));
   } else {
-    await dispatch(createSurvey(form));
+    result = await dispatch(createSurvey(form));
   }
-  handleCancel();
-  dispatch(fetchActiveSurveys()); // ← ekle
+
+  if (result.meta.requestStatus === 'fulfilled') {
+    handleCancel(); // sadece başarılıysa kapat
+  }
 };
 
 const handleDelete = async (id: number) => {
-  if (window.confirm('Bu anketi silmek istediğinize emin misiniz?')) {
+  if (window.confirm('Bu anketi silmek istediğinize emin misiniz? Katılım kayıtları da etkilenebilir.')) {
     await dispatch(deleteSurvey(id));
-    dispatch(fetchActiveSurveys()); // ← ekle
+    dispatch(fetchAllSurveysAdmin()); // ← ekle
   }
 };
 
@@ -112,12 +119,12 @@ const handleDelete = async (id: number) => {
             <div className="field-row">
               <div className="field">
                 <label>Başlık</label>
-                <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+                <input type="text" maxLength={100} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
               </div>
             </div>
             <div className="field">
               <label>Açıklama</label>
-              <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={2} />
+              <textarea maxLength={500} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={2} />
             </div>
             <div className="field-row">
               <div className="field">
@@ -197,7 +204,8 @@ const handleDelete = async (id: number) => {
               })}
             </div>
           </div>
-
+            {error && <div className="error-msg">{error}</div>}
+              
             <div className="form-actions">
               <button type="button" className="btn-ghost" onClick={handleCancel}>İptal</button>
               <button type="submit" className="btn-primary">{editingId ? 'Güncelle' : 'Yayınla'}</button>
@@ -233,7 +241,7 @@ const handleDelete = async (id: number) => {
   onClick={async () => {
     if (!s.id) return;
     await dispatch(toggleSurveyActive(s.id));
-    dispatch(fetchActiveSurveys()); // ← liste yenile
+    dispatch(fetchAllSurveysAdmin()); // ← liste yenile
   }}
 >
   {s.isActive ? 'Pasife Al' : 'Aktifleştir'}
