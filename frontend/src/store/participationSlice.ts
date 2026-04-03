@@ -1,29 +1,16 @@
 // src/store/participationSlice.ts
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { API_URLS } from '../api/apiConfig';
+import mgmtApi  from '../api/axiosConfig';
 import type { SurveyDetail } from '../types/Survey';
+import { followApi } from '../api/axiosConfig';
 
-const mgmt = axios.create({ baseURL: API_URLS.management });
-mgmt.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
-const follow = axios.create({ baseURL: API_URLS.follow });
-follow.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
 
 export const fetchSurveyById = createAsyncThunk(
   'participation/fetchById',
   async (id: string, { rejectWithValue }) => {
     try {
-      const res = await mgmt.get<SurveyDetail>(`Surveys/${id}`);
+      const res = await mgmtApi.get<SurveyDetail>(`Surveys/${id}`);
       return res.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || 'Anket yüklenemedi');
@@ -44,7 +31,7 @@ export const submitSurveyAnswers = createAsyncThunk(
     }[];
   }, { rejectWithValue }) => {
     try {
-      const res = await follow.post('Participations/submit', payload);
+      const res = await followApi.post('Participations/submit', payload);
       return res.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || 'Gönderim başarısız');

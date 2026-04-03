@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import api from '../api/axiosConfig';
+import identityApi from '../api/axiosConfig';
 import type { LoginRequest, AuthResponse } from '../types/User';
 
 export const login = createAsyncThunk(
   'auth/login',
   async (credentials: LoginRequest, { rejectWithValue }) => {
     try {
-      const response = await api.post<AuthResponse>('Account/login', credentials);
+      const response = await identityApi.post<AuthResponse>('Account/login', credentials);
       // token bir nesne: { token: string, expiration: string }
       localStorage.setItem('token', response.data.token.token);
       return response.data;

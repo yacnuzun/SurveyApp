@@ -9,7 +9,7 @@ import AnswerTemplatePage from './pages/AnswerTemplatePage/AnswerTemplatePage';
 import QuestionPage from './pages/QuestionPage/QuestionPage';
 import SurveyManagementPage from './pages/SurveyManagementPage/SurveyManagementPage';
 import Navbar from './components/Navbar/Navbar';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/Protectedroute';
 import AdminRoute from './components/AdminRoute';
 
 /**

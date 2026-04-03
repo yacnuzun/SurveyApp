@@ -1,18 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { API_URLS } from '../api/apiConfig';
+import mgmtApi  from '../api/axiosConfig';
 import type { AnswerTemplate, AnswerTemplateCreateDto, AnswerTemplateUpdateDto } from '../types/AnswerTemplate';
  
-const mgmt = axios.create({ baseURL: API_URLS.management });
-mgmt.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
  
 export const fetchTemplates = createAsyncThunk('answerTemplate/fetchAll', async (_, { rejectWithValue }) => {
   try {
-    const res = await mgmt.get<AnswerTemplate[]>('AnswerTemplates');
+    const res = await mgmtApi.get<AnswerTemplate[]>('AnswerTemplates');
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Şablonlar yüklenemedi');
@@ -21,7 +14,7 @@ export const fetchTemplates = createAsyncThunk('answerTemplate/fetchAll', async 
  
 export const createTemplate = createAsyncThunk('answerTemplate/create', async (dto: AnswerTemplateCreateDto, { rejectWithValue }) => {
   try {
-    const res = await mgmt.post('AnswerTemplates', dto);
+    const res = await mgmtApi.post('AnswerTemplates', dto);
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Şablon oluşturulamadı');
@@ -30,7 +23,7 @@ export const createTemplate = createAsyncThunk('answerTemplate/create', async (d
  
 export const updateTemplate = createAsyncThunk('answerTemplate/update', async (dto: AnswerTemplateUpdateDto, { rejectWithValue }) => {
   try {
-    const res = await mgmt.put(`AnswerTemplates/${dto.id}`, dto);
+    const res = await mgmtApi.put(`AnswerTemplates/${dto.id}`, dto);
     return res.data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Şablon güncellenemedi');
@@ -39,7 +32,7 @@ export const updateTemplate = createAsyncThunk('answerTemplate/update', async (d
  
 export const deleteTemplate = createAsyncThunk('answerTemplate/delete', async (id: number, { rejectWithValue }) => {
   try {
-    await mgmt.delete(`AnswerTemplates/${id}`);
+    await mgmtApi.delete(`AnswerTemplates/${id}`);
     return id;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || 'Şablon silinemedi');

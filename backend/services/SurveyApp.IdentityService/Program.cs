@@ -97,7 +97,7 @@ namespace SurveyApp.IdentityService
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseCors("FrontendPolicy");
             app.UseAuthentication();
