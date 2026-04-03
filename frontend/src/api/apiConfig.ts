@@ -1,7 +1,7 @@
 // src/api/apiConfig.ts
 export const API_URLS = {
-  identity:    'http://identity.survey.localhost/api',
-  management:  'http://management.survey.localhost/api',
-  follow:      'http://follow.survey.localhost/api',
-  reporting:   'http://reporting.survey.localhost/api',
+  identity:    'https://identity.survey.localhost/api',
+  management:  'https://management.survey.localhost/api',
+  follow:      'https://follow.survey.localhost/api',
+  reporting:   'https://reporting.survey.localhost/api',
 } as const;

@@ -1,7 +1,7 @@
 // src/store/surveySlice.ts
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import mgmtApi  from '../api/axiosConfig';
+import { mgmtApi }  from '../api/axiosConfig';
 import type { Survey, SurveyCreateDto, SurveyUpdateDto } from '../types/Survey';
 
 

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import identityApi from '../api/axiosConfig';
+import {identityApi} from '../api/axiosConfig';
 import type { LoginRequest, AuthResponse } from '../types/User';
 
 export const login = createAsyncThunk(

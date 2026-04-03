@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { Question, QuestionCreateDto, QuestionUpdateDto } from '../types/Survey';
-import mgmtApi  from '../api/axiosConfig';
+import { mgmtApi }  from '../api/axiosConfig';
 
  
 

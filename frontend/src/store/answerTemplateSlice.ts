@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import mgmtApi  from '../api/axiosConfig';
+import { mgmtApi }  from '../api/axiosConfig';
 import type { AnswerTemplate, AnswerTemplateCreateDto, AnswerTemplateUpdateDto } from '../types/AnswerTemplate';
  
  
