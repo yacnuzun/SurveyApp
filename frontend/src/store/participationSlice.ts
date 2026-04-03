@@ -1,7 +1,7 @@
 // src/store/participationSlice.ts
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import mgmtApi  from '../api/axiosConfig';
+import {mgmtApi}  from '../api/axiosConfig';
 import type { SurveyDetail } from '../types/Survey';
 import { followApi } from '../api/axiosConfig';
 
