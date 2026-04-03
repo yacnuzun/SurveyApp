@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SurveyApp.Shared.Helpers;
 using SurveyApp.Shared.Helpers.Security.Encryption;
 using SurveyApp.Shared.Helpers.Security.Security;
 using SurveyApp.SurveyManagement.Infrastructure.Data;
@@ -94,6 +95,7 @@ namespace SurveyApp.SurveyManagement
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseMiddleware<GlobalExceptionMiddleware>();
 
             app.MapControllers();
             using (var scope = app.Services.CreateScope())

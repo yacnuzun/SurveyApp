@@ -4,16 +4,17 @@ using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SurveyApp.ReportingService.Infrastructure.Data;
 using SurveyApp.ReportingService.Infrastructure.DependencyResolver;
+using SurveyApp.ReportingService.Infrastructure.Helpers.Consumer;
+using SurveyApp.Shared;
+using SurveyApp.Shared.Helpers;
 using SurveyApp.Shared.Helpers.Security.Encryption;
 using SurveyApp.Shared.Helpers.Security.Security;
-using SurveyApp.Shared;
-using SurveyApp.ReportingService.Infrastructure.Helpers.Consumer;
-using SurveyApp.ReportingService.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace SurveyApp.ReportingService
 {
@@ -116,6 +117,7 @@ namespace SurveyApp.ReportingService
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseMiddleware<GlobalExceptionMiddleware>();
 
             app.MapControllers();
             using (var scope = app.Services.CreateScope())

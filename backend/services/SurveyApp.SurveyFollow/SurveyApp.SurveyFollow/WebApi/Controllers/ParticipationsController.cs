@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SurveyApp.SurveyFollow.Application.Dto_s;
 using SurveyApp.SurveyFollow.Application.Services;
 using System.Security.Claims;
+using SurveyApp.Shared.Helpers;
 
 namespace SurveyApp.SurveyFollow.WebApi.Controllers
 {
@@ -21,8 +22,7 @@ namespace SurveyApp.SurveyFollow.WebApi.Controllers
         [Authorize]
         public async Task<IActionResult> Submit(ParticipationForCreateDto dto)
         {
-            var userId = int.Parse(User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var userId = HttpContext.GetUserId();
             var result = await _participationService.SubmitParticipation(dto, userId);
             return result.Success ? Ok(result) : BadRequest(result.Message);
         }

@@ -1,4 +1,5 @@
-﻿using SurveyApp.IdentityService.Application.Services.Interfaces;
+﻿using SurveyApp.IdentityService.Application.Dto_s;
+using SurveyApp.IdentityService.Application.Services.Interfaces;
 using SurveyApp.IdentityService.Domain.Entities;
 using SurveyApp.IdentityService.Domain.Enums;
 using SurveyApp.IdentityService.Infrastructure.Repositories.Interfaces;
@@ -104,6 +105,44 @@ namespace SurveyApp.IdentityService.Application.Services.Implementations
             }
 
         }
+
+        public async Task<IDataResult<List<UserDto>>> GetAll(UserFilterDto? filter = null)
+        {
+            try
+            {
+                var result = await _userRepository.ListAsync();
+                if (result == null)
+                    return new ErrorDataResult<List<UserDto>>();
+
+                var users = result.ToList();
+
+                if (!string.IsNullOrWhiteSpace(filter?.Search))
+                {
+                    var search = filter.Search.ToLower();
+                    users = users.Where(u =>
+                        u.UserName.ToLower().Contains(search) ||
+                        u.Email.ToLower().Contains(search)
+                    ).ToList();
+                }
+
+                return new SuccessDataResult<List<UserDto>>(
+                    users.Select( s => {
+                        return new UserDto
+                        {
+                            UserName = s.UserName,
+                            Email = s.Email,
+                            UserId = s.Id,
+                            Status = s.Status
+                        };
+                }).ToList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{ex.InnerException}/{ex.Message}/{ex.Source}");
+                throw;
+            }
+        }
+
 
         public async Task<IDataResult<User>> GetById(int id)
         {

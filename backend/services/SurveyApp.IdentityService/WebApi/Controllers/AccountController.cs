@@ -7,6 +7,7 @@ using SurveyApp.IdentityService.Infrastructure.Helpers.JWT;
 using SurveyApp.Shared.Constant;
 using SurveyApp.Shared.Dto_s;
 using System.Security.Claims;
+using SurveyApp.Shared.Helpers;
 
 namespace SurveyApp.IdentityService.WebApi.Controllers
 {
@@ -15,13 +16,16 @@ namespace SurveyApp.IdentityService.WebApi.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IUserService _userService;
         private readonly IValidator<UserForRegisterDto> _registerValidator;
 
         public AccountController(IAuthService authService,
-            IValidator<UserForRegisterDto> registerValidator)
+            IValidator<UserForRegisterDto> registerValidator,
+            IUserService userService)
         {
             _authService = authService;
             _registerValidator = registerValidator;
+            _userService = userService;
         }
 
         [HttpPost("login")]
@@ -47,11 +51,19 @@ namespace SurveyApp.IdentityService.WebApi.Controllers
             return Ok(result.Data);
         }
 
+        [HttpGet("users")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUsers([FromQuery] UserFilterDto filter)
+        {
+            var result = await _userService.GetAll(filter);
+            return result.Success ? Ok(result.Data) : BadRequest(result.Message);
+        }
+
         [HttpGet("me")] 
         [Authorize]
         public async Task<IActionResult> GetMyDetails(string targetRole)
         {
-            var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var userEmail = HttpContext.GetUserMail();
 
             if (string.IsNullOrEmpty(userEmail)) return Unauthorized();
 

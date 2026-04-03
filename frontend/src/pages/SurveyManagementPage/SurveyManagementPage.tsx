@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchActiveSurveys, createSurvey, updateSurvey, deleteSurvey, toggleSurveyActive } from '../../store/surveySlice';
 import { fetchQuestions } from '../../store/questionSlice';
+import { fetchUsers } from '../../store/userSlice';
 import type { AppDispatch, RootState } from '../../store/appStore';
 import type { Survey, SurveyCreateDto } from '../../types/Survey';
 import { useNavigate } from 'react-router-dom';
@@ -27,15 +28,19 @@ const SurveyManagementPage = () => {
   const [form, setForm] = useState<SurveyCreateDto>(emptyForm());
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
-  // Kullanıcı ID girişi — gerçek projede user listesi API'den çekilir
-  const [userIdInput, setUserIdInput] = useState('');
+
+  const { users } = useSelector((state: RootState) => state.user);
+
+  const [userSearch, setUserSearch] = useState('');
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   useEffect(() => {
     dispatch(fetchActiveSurveys()).then((res: any) => {
     console.log('surveys response:', res.payload);
   });
     dispatch(fetchQuestions());
-  }, [dispatch]);
+    dispatch(fetchUsers(userSearch));
+  }, [userSearch,dispatch]);
 
   const toggleQuestion = (id: number) => {
     setForm(f => ({
@@ -44,14 +49,6 @@ const SurveyManagementPage = () => {
         ? f.questionIds.filter(q => q !== id)
         : [...f.questionIds, id],
     }));
-  };
-
-  const addUserId = () => {
-    const id = parseInt(userIdInput);
-    if (!isNaN(id) && !form.assignedUserIds.includes(id)) {
-      setForm(f => ({ ...f, assignedUserIds: [...f.assignedUserIds, id] }));
-    }
-    setUserIdInput('');
   };
 
   const removeUserId = (id: number) => {
@@ -74,7 +71,8 @@ const SurveyManagementPage = () => {
   const handleCancel = () => {
     setEditingId(null);
     setForm(emptyForm());
-    setUserIdInput('');
+    setUserSearch('');           
+    setShowUserDropdown(false);  
     setShowForm(false);
   };
 
@@ -153,27 +151,52 @@ const handleDelete = async (id: number) => {
               </div>
             </div>
 
-            {/* Kullanıcı atama */}
-            <div className="field">
-              <label>Atanan Kullanıcılar</label>
-              <div className="user-assign-row">
-                <input
-                  type="number"
-                  placeholder="Kullanıcı ID girin"
-                  value={userIdInput}
-                  onChange={e => setUserIdInput(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addUserId())}
-                />
-                <button type="button" className="btn-ghost" onClick={addUserId}>Ekle</button>
-              </div>
-              <div className="user-chips">
-                {form.assignedUserIds.map(uid => (
-                  <span key={uid} className="chip chip-user">
-                    #{uid} <button type="button" onClick={() => removeUserId(uid)}>✕</button>
-                  </span>
-                ))}
-              </div>
+            
+          <div className="field">
+            <label>Atanan Kullanıcılar</label>
+            <div className="user-assign-row" style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="İsim veya email ile ara..."
+                value={userSearch}
+                onChange={e => { setUserSearch(e.target.value); setShowUserDropdown(true); }}
+                onFocus={() => setShowUserDropdown(true)}
+                onBlur={() => setTimeout(() => setShowUserDropdown(false), 150)}
+              />
+              {showUserDropdown && users.length > 0 && (
+                <div className="user-dropdown">
+                  {users
+                    .filter(u => !form.assignedUserIds.includes(u.userId))
+                    .map(u => (
+                      <div
+                        key={u.userId}
+                        className="user-dropdown-item"
+                        onMouseDown={() => {
+                          setForm(f => ({ ...f, assignedUserIds: [...f.assignedUserIds, u.userId] }));
+                          setUserSearch('');
+                          setShowUserDropdown(false);
+                        }}
+                      >
+                        <span>{u.userName}</span>
+                        <span className="hint">{u.email}</span>
+                      </div>
+                    ))
+                  }
+                </div>
+              )}
             </div>
+            <div className="user-chips">
+              {form.assignedUserIds.map(uid => {
+                const user = users.find(u => u.userId === uid);
+                return (
+                  <span key={uid} className="chip chip-user">
+                    {user ? user.userName : `#${uid}`}
+                    <button type="button" onClick={() => removeUserId(uid)}>✕</button>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
 
             <div className="form-actions">
               <button type="button" className="btn-ghost" onClick={handleCancel}>İptal</button>

@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using SurveyApp.IdentityService.Infrastructure.Data;
 using SurveyApp.IdentityService.Infrastructure.DependencyResolver.AutofacHelper;
 using SurveyApp.IdentityService.Infrastructure.Helpers.JWT;
+using SurveyApp.Shared.Helpers;
 using SurveyApp.Shared.Helpers.Security.Encryption;
 using System.Text.Json.Serialization;
 
@@ -102,6 +103,8 @@ namespace SurveyApp.IdentityService
             app.UseCors("FrontendPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseMiddleware<GlobalExceptionMiddleware>();
 
             app.MapControllers();
             using (var scope = app.Services.CreateScope())

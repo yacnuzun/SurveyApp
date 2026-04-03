@@ -6,6 +6,7 @@ import surveyReducer from './surveySlice';
 import participationReducer from './participationSlice';
 import answerTemplateReducer from './answerTemplateSlice';
 import questionReducer from './questionSlice';
+import userReducer from './userSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     participation: participationReducer,
     answerTemplate: answerTemplateReducer,
     question: questionReducer,
+    user: userReducer, 
   },
 });
 

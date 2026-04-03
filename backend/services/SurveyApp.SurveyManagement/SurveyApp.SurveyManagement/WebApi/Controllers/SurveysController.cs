@@ -4,6 +4,7 @@ using SurveyApp.Shared.Abstract;
 using SurveyApp.SurveyManagement.Application.Dto_s;
 using SurveyApp.SurveyManagement.Application.Services;
 using System.Security.Claims;
+using SurveyApp.Shared.Helpers;
 
 namespace SurveyApp.SurveyManagement.WebApi.Controllers
 {
@@ -23,8 +24,7 @@ namespace SurveyApp.SurveyManagement.WebApi.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateComplex(SurveyForCreateDto surveyForCreateDto)
         {
-            var adminId = Convert.ToInt32(User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var adminId = HttpContext.GetUserId();
             var result = await _surveyService.CreateAsync(surveyForCreateDto, adminId);
             return result.Success ? Ok(result) : BadRequest(result.Message);
         }
@@ -33,8 +33,7 @@ namespace SurveyApp.SurveyManagement.WebApi.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(SurveyForCreateDto dto)
         {
-            var adminId = Convert.ToInt32(User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var adminId = HttpContext.GetUserId();
             var result = await _surveyService.CreateAsync(dto, adminId);
             return result.Success ? Ok(result) : BadRequest(result.Message);
         }
@@ -84,8 +83,7 @@ namespace SurveyApp.SurveyManagement.WebApi.Controllers
         [Authorize]
         public async Task<IActionResult> GetMySurveys()
         {
-            var userId = Convert.ToInt32(User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var userId = HttpContext.GetUserId();
             var result = await _surveyService.GetAssignedSurveysForUser(userId);
             return result.Success ? Ok(result.Data) : BadRequest(result.Message);
         }

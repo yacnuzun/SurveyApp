@@ -22,3 +22,10 @@ export interface LoginRequest {
   email: string;
   password: string;
 }
+
+export interface UserDto {
+  userId: number;
+  userName: string;
+  email: string;
+  status: boolean;
+}
